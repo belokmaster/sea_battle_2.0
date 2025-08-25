@@ -104,7 +104,7 @@ func (b *Board) PlaceBoard() {
 	}
 }
 
-func (b *Board) AttackBot() (AttackResult, error) {
+func (b *Board) AttackBot(attacker *Player) (AttackResult, error) {
 	var currentPoint Point
 	for {
 		x := rand.Intn(10)
@@ -114,7 +114,7 @@ func (b *Board) AttackBot() (AttackResult, error) {
 			break
 		}
 	}
-	return b.Attack(&currentPoint)
+	return b.Attack(&currentPoint, attacker)
 }
 
 func (b *Board) AllShipSunk() bool {
@@ -126,7 +126,7 @@ func (b *Board) AllShipSunk() bool {
 	return true
 }
 
-func (b *Board) Attack(p *Point) (AttackResult, error) {
+func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
 	if p.X < 0 || p.X >= 10 || p.Y < 0 || p.Y >= 10 {
 		return ResultMiss, errors.New("атака вне поля")
 	}
@@ -145,6 +145,13 @@ func (b *Board) Attack(p *Point) (AttackResult, error) {
 				x, y := ship.Position[j].X, ship.Position[j].Y
 				if p.X == x && p.Y == y {
 					ship.Hits++
+
+					if attacker.HasDoubleDamage {
+						if ship.Hits < ship.Size {
+							ship.Hits++
+						}
+						attacker.HasDoubleDamage = false
+					}
 
 					if ship.Hits == ship.Size {
 						ship.IsSunk = true

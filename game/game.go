@@ -1,11 +1,15 @@
 package game
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Player struct {
-	Name       string
-	MyBoard    *Board
-	EnemyBoard *Board
+	Name            string
+	MyBoard         *Board
+	EnemyBoard      *Board
+	Abilities       []Ability
+	HasDoubleDamage bool
 }
 
 type Game struct {
@@ -21,15 +25,19 @@ func NewGame() *Game {
 	board2.PlaceBoard()
 
 	p1 := Player{
-		Name:       "Player",
-		MyBoard:    board1,
-		EnemyBoard: board2,
+		Name:            "Player",
+		MyBoard:         board1,
+		EnemyBoard:      board2,
+		Abilities:       []Ability{&ArtilleryStrike{}, &Scanner{}, &DoubleDamage{}},
+		HasDoubleDamage: false,
 	}
 
 	p2 := Player{
-		Name:       "Computer",
-		MyBoard:    board2,
-		EnemyBoard: board1,
+		Name:            "Computer",
+		MyBoard:         board2,
+		EnemyBoard:      board1,
+		Abilities:       []Ability{&ArtilleryStrike{}, &Scanner{}, &DoubleDamage{}},
+		HasDoubleDamage: false,
 	}
 
 	game := Game{
@@ -57,6 +65,36 @@ CurrentGameLoop:
 		var err error
 
 		if g.CurrentPlayer == g.Player1 {
+			abilities := g.CurrentPlayer.Abilities
+			if len(abilities) > 0 {
+				fmt.Println("Хотите использовать способность? (y/n)")
+				var ans string
+				fmt.Scan(&ans)
+
+				if ans == "y" || ans == "Y" {
+					fmt.Println("Выберите способность, которую хотите использовать.")
+					fmt.Println("Ваши способности:")
+					for i, ab := range abilities {
+						fmt.Printf("%d: %s\n", i, ab.Name())
+					}
+					var n int
+					for {
+						fmt.Scan(&n)
+						if n >= len(abilities) || n < 0 {
+							fmt.Println("Неккоректный ввод. Повторите еще раз")
+							continue
+						} else {
+							s := fmt.Sprintf("Вы выбрали способность: %s", abilities[n].Name())
+							fmt.Println(s)
+							abilityResult := abilities[n].Apply(g)
+							fmt.Println(abilityResult)
+							g.CurrentPlayer.Abilities = append(g.CurrentPlayer.Abilities[:n], g.CurrentPlayer.Abilities[n+1:]...)
+							break
+						}
+					}
+				}
+			}
+
 			fmt.Print("Введите координаты для атаки: ")
 			var x, y int
 
@@ -67,7 +105,7 @@ CurrentGameLoop:
 			}
 
 			attackPoint := Point{X: x, Y: y}
-			result, err = g.CurrentPlayer.EnemyBoard.Attack(&attackPoint)
+			result, err = g.CurrentPlayer.EnemyBoard.Attack(&attackPoint, g.CurrentPlayer)
 			if err != nil {
 				fmt.Println("Ошибка:", err)
 			} else {
@@ -75,13 +113,14 @@ CurrentGameLoop:
 				case ResultHit:
 					fmt.Println("Попадание! Вы ходите еще раз.")
 				case ResultSunk:
-					fmt.Println("Корабль потоплен! Вы ходите еще раз.")
+					fmt.Println("Корабль потоплен! Вы ходите еще раз и вам добавлена способность!")
+					g.CurrentPlayer.AddRandomAbility()
 				case ResultMiss:
 					fmt.Println("Промах! Ход переходит.")
 				}
 			}
 		} else {
-			result, err = g.CurrentPlayer.EnemyBoard.AttackBot()
+			result, err = g.CurrentPlayer.EnemyBoard.AttackBot(g.Player2)
 			if err != nil {
 				fmt.Println("Ошибка в ходе бота:", err)
 			}

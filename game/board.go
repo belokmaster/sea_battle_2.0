@@ -126,6 +126,24 @@ func (b *Board) AllShipSunk() bool {
 	return true
 }
 
+func (b *Board) markSunkShip(ship *Ship) {
+	ship.IsSunk = true
+
+	points := ship.Position
+	for _, p := range points {
+		for dx := -1; dx <= 1; dx++ {
+			for dy := -1; dy <= 1; dy++ {
+				checkX, checkY := p.X+dx, p.Y+dy
+				if checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10 {
+					if b.Grid[checkX][checkY] == EmptyCell {
+						b.Grid[checkX][checkY] = MissCell
+					}
+				}
+			}
+		}
+	}
+}
+
 func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
 	if p.X < 0 || p.X >= 10 || p.Y < 0 || p.Y >= 10 {
 		return ResultMiss, errors.New("атака вне поля")
@@ -153,8 +171,8 @@ func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
 						attacker.HasDoubleDamage = false
 					}
 
-					if ship.Hits == ship.Size {
-						ship.IsSunk = true
+					if ship.Hits >= ship.Size {
+						b.markSunkShip(ship)
 						return ResultSunk, nil
 					}
 					return ResultHit, nil

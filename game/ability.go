@@ -5,15 +5,6 @@ import (
 	"math/rand"
 )
 
-type Ability interface {
-	Apply(g *Game) string
-	Name() string
-}
-
-type ArtilleryStrike struct{}
-type Scanner struct{}
-type DoubleDamage struct{}
-
 func (a *ArtilleryStrike) Apply(g *Game) string {
 	enemyBoard := g.CurrentPlayer.EnemyBoard
 	enemyLivesCells := []Point{}

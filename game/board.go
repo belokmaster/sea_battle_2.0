@@ -6,41 +6,6 @@ import (
 	"math/rand"
 )
 
-type CellState int
-
-const (
-	EmptyCell CellState = iota
-	ShipCell
-	MissCell
-	HitCell
-)
-
-type AttackResult int
-
-const (
-	ResultMiss AttackResult = iota
-	ResultHit
-	ResultSunk
-)
-
-type Point struct {
-	X int
-	Y int
-}
-
-type Ship struct {
-	Size       int
-	IsVertical bool
-	Hits       int
-	IsSunk     bool
-	Position   []Point
-}
-
-type Board struct {
-	Grid  [10][10]CellState
-	Ships []Ship
-}
-
 func NewBoard() *Board {
 	return &Board{
 		Grid:  [10][10]CellState{},
@@ -113,18 +78,15 @@ func (b *Board) AllShipSunk() bool {
 	return true
 }
 
-func (b *Board) markSunkShip(ship *Ship, pl *Player) {
-	ship.IsSunk = true
-
+func (b *Board) markSunkShip(ship *Ship) []Point {
 	points := ship.Position
+	markedCells := []Point{}
 	for _, p := range points {
 		for dx := -1; dx <= 1; dx++ {
 			for dy := -1; dy <= 1; dy++ {
 				checkX, checkY := p.X+dx, p.Y+dy
 				if checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10 {
-					if pl.Name == "Computer" {
-						pl.verifiedPoints = append(pl.verifiedPoints, Point{X: checkX, Y: checkY})
-					}
+					markedCells = append(markedCells, Point{X: checkX, Y: checkY})
 
 					if b.Grid[checkX][checkY] == EmptyCell {
 						b.Grid[checkX][checkY] = MissCell
@@ -133,6 +95,7 @@ func (b *Board) markSunkShip(ship *Ship, pl *Player) {
 			}
 		}
 	}
+	return markedCells
 }
 
 func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
@@ -156,14 +119,18 @@ func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
 					ship.Hits++
 
 					if attacker.HasDoubleDamage {
-						if ship.Hits < ship.Size {
-							ship.Hits++
-						}
+						// тут логику с дабл демеджом сделать. пока он бесполезен
 						attacker.HasDoubleDamage = false
 					}
 
 					if ship.Hits >= ship.Size {
-						b.markSunkShip(ship, attacker)
+						ship.IsSunk = true
+						markedCells := b.markSunkShip(ship)
+
+						if observer, ok := interface{}(attacker).(AttackObserver); ok {
+							observer.ShipSunk(markedCells)
+						}
+
 						return ResultSunk, nil
 					}
 					return ResultHit, nil

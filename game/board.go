@@ -104,19 +104,6 @@ func (b *Board) PlaceBoard() {
 	}
 }
 
-func (b *Board) AttackBot(attacker *Player) (AttackResult, error) {
-	var currentPoint Point
-	for {
-		x := rand.Intn(10)
-		y := rand.Intn(10)
-		if b.Grid[x][y] != MissCell && b.Grid[x][y] != HitCell {
-			currentPoint = Point{X: x, Y: y}
-			break
-		}
-	}
-	return b.Attack(&currentPoint, attacker)
-}
-
 func (b *Board) AllShipSunk() bool {
 	for i := range b.Ships {
 		if !b.Ships[i].IsSunk {
@@ -126,7 +113,7 @@ func (b *Board) AllShipSunk() bool {
 	return true
 }
 
-func (b *Board) markSunkShip(ship *Ship) {
+func (b *Board) markSunkShip(ship *Ship, pl *Player) {
 	ship.IsSunk = true
 
 	points := ship.Position
@@ -135,6 +122,10 @@ func (b *Board) markSunkShip(ship *Ship) {
 			for dy := -1; dy <= 1; dy++ {
 				checkX, checkY := p.X+dx, p.Y+dy
 				if checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10 {
+					if pl.Name == "Computer" {
+						pl.verifiedPoints = append(pl.verifiedPoints, Point{X: checkX, Y: checkY})
+					}
+
 					if b.Grid[checkX][checkY] == EmptyCell {
 						b.Grid[checkX][checkY] = MissCell
 					}
@@ -172,7 +163,7 @@ func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
 					}
 
 					if ship.Hits >= ship.Size {
-						b.markSunkShip(ship)
+						b.markSunkShip(ship, attacker)
 						return ResultSunk, nil
 					}
 					return ResultHit, nil

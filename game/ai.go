@@ -19,13 +19,13 @@ func (g *Game) handleComputerTurn() (AttackResult, error) {
 	enemyBoard := computer.EnemyBoard
 	var targetPoint Point
 
-	switch computer.state {
+	switch computer.State {
 	case Searching:
 		for {
 			x, y := rand.Intn(10), rand.Intn(10)
 			targetPoint = Point{X: x, Y: y}
 
-			if contains(computer.allHits, targetPoint) || contains(computer.verifiedPoints, targetPoint) {
+			if contains(computer.AllHits, targetPoint) || contains(computer.VerifiedPoints, targetPoint) {
 				continue
 			}
 
@@ -35,7 +35,7 @@ func (g *Game) handleComputerTurn() (AttackResult, error) {
 
 	case FinishingOff:
 		targetFound := false
-		for _, hitPoint := range computer.targetHits {
+		for _, hitPoint := range computer.TargetHits {
 			directions := []Point{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
 
 			for _, d := range directions {
@@ -45,7 +45,7 @@ func (g *Game) handleComputerTurn() (AttackResult, error) {
 					continue
 				}
 
-				if contains(computer.allHits, candidate) || contains(computer.verifiedPoints, candidate) {
+				if contains(computer.AllHits, candidate) || contains(computer.VerifiedPoints, candidate) {
 					continue
 				}
 
@@ -62,11 +62,11 @@ func (g *Game) handleComputerTurn() (AttackResult, error) {
 
 		if !targetFound {
 			fmt.Println("Бот не нашел клетку корабля. Возврат в режим поиска.")
-			computer.state = Searching
+			computer.State = Searching
 			for {
 				x, y := rand.Intn(10), rand.Intn(10)
 				targetPoint = Point{X: x, Y: y}
-				if contains(computer.verifiedPoints, targetPoint) || contains(computer.allHits, targetPoint) {
+				if contains(computer.VerifiedPoints, targetPoint) || contains(computer.AllHits, targetPoint) {
 					continue
 				}
 				break
@@ -81,22 +81,22 @@ func (g *Game) handleComputerTurn() (AttackResult, error) {
 
 	switch result {
 	case ResultHit:
-		computer.allHits = append(computer.allHits, targetPoint)
-		computer.targetHits = append(computer.targetHits, targetPoint)
-		computer.state = FinishingOff
+		computer.AllHits = append(computer.AllHits, targetPoint)
+		computer.TargetHits = append(computer.TargetHits, targetPoint)
+		computer.State = FinishingOff
 	case ResultSunk:
-		computer.allHits = append(computer.allHits, targetPoint)
-		computer.targetHits = []Point{}
-		computer.state = Searching
+		computer.AllHits = append(computer.AllHits, targetPoint)
+		computer.TargetHits = []Point{}
+		computer.State = Searching
 	case ResultMiss:
-		computer.verifiedPoints = append(computer.verifiedPoints, targetPoint)
+		computer.VerifiedPoints = append(computer.VerifiedPoints, targetPoint)
 	}
 	return result, nil
 }
 
 func (p *Player) ShipSunkBot(makedPoints []Point) {
 	if p.Name == "Computer" {
-		p.verifiedPoints = append(p.verifiedPoints, makedPoints...)
+		p.VerifiedPoints = append(p.VerifiedPoints, makedPoints...)
 		fmt.Printf("Бот обновил данные после потопления корабля")
 	}
 }

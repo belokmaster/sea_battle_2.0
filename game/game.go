@@ -4,6 +4,15 @@ import (
 	"fmt"
 )
 
+func NewGameFromFile(filename string) *Game {
+	game, err := LoadGame(filename)
+	if err != nil {
+		fmt.Println("Ошибка при попытке загрузить файл для начала игры:", err)
+		return nil
+	}
+	return game
+}
+
 func NewGame() *Game {
 	board1 := NewBoard()
 	board2 := NewBoard()
@@ -14,7 +23,7 @@ func NewGame() *Game {
 		Name:            "Player",
 		MyBoard:         board1,
 		EnemyBoard:      board2,
-		Abilities:       []Ability{&ArtilleryStrike{}, &Scanner{}, &DoubleDamage{}},
+		Abilities:       []Ability{},
 		HasDoubleDamage: false,
 	}
 
@@ -22,12 +31,12 @@ func NewGame() *Game {
 		Name:            "Computer",
 		MyBoard:         board2,
 		EnemyBoard:      board1,
-		Abilities:       []Ability{&ArtilleryStrike{}, &Scanner{}, &DoubleDamage{}},
+		Abilities:       []Ability{},
 		HasDoubleDamage: false,
-		state:           Searching,
-		allHits:         []Point{},
-		targetHits:      []Point{},
-		verifiedPoints:  []Point{},
+		State:           Searching,
+		AllHits:         []Point{},
+		TargetHits:      []Point{},
+		VerifiedPoints:  []Point{},
 	}
 
 	game := Game{

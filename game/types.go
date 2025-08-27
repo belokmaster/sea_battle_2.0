@@ -46,10 +46,10 @@ type Player struct {
 	Abilities       []Ability
 	HasDoubleDamage bool
 
-	state          AIState
-	allHits        []Point // все попадания
-	targetHits     []Point // добиваемый корабль
-	verifiedPoints []Point // промахи
+	State          AIState `json:"state"`           // поведение ИИ
+	AllHits        []Point `json:"all_hits"`        // все попадания
+	TargetHits     []Point `json:"target_hits"`     // добиваемый корабль
+	VerifiedPoints []Point `json:"verified_points"` // промахи
 }
 
 type Game struct {

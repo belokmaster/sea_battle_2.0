@@ -1,12 +1,19 @@
 package game
 
-import "fmt"
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strings"
+)
 
 func (g *Game) handleHumanTurn() (AttackResult, error) {
+	reader := bufio.NewReader(os.Stdin)
+
 	if len(g.CurrentPlayer.Abilities) > 0 {
-		fmt.Println("Хотите использовать способность? (y/n)")
-		var ans string
-		fmt.Scan(&ans)
+		fmt.Println("У вас есть способности. Хотите их использовать? (y/n)")
+		inputBytes, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		ans := strings.TrimSpace(inputBytes)
 
 		if ans == "y" || ans == "Y" {
 			fmt.Println("Выберите способность, которую хотите использовать.")
@@ -19,6 +26,7 @@ func (g *Game) handleHumanTurn() (AttackResult, error) {
 				fmt.Scan(&n)
 				if n < 0 || n >= len(g.CurrentPlayer.Abilities) {
 					fmt.Println("Некорректный ввод. Повторите еще раз")
+					reader.ReadString('\n')
 					continue
 				}
 
@@ -31,16 +39,32 @@ func (g *Game) handleHumanTurn() (AttackResult, error) {
 				break
 			}
 		}
+		reader.ReadString('\n')
 	}
 
+	var input string
 	var x, y int
-	fmt.Print("Введите координаты для атаки: ")
 	for {
-		n, err := fmt.Scan(&x, &y)
-		if n != 2 || err != nil || x < 0 || x > 9 || y < 0 || y > 9 {
-			fmt.Println("Некорректный ввод. Повторите еще раз.")
+		fmt.Print("Введите координаты для атаки или команду 'save' для сохранения: ")
+		inputBytes, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+		input = strings.TrimSpace(inputBytes)
+
+		if input == "save" {
+			err := g.SaveGame("savegame.json")
+			if err != nil {
+				fmt.Println("Ошибка при попытке сохранить игру: ", err)
+				fmt.Println("Повторите еще раз")
+				continue
+			}
 			continue
 		}
+
+		n, err := fmt.Sscanf(input, "%d %d", &x, &y)
+		if n != 2 || err != nil || x < 0 || x > 9 || y < 0 || y > 9 {
+			fmt.Println("Некорректный ввод. Повторите еще раз")
+			continue
+		}
+
 		break
 	}
 

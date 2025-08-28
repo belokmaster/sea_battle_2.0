@@ -14,7 +14,7 @@ func contains(points []Point, p Point) bool {
 	return false
 }
 
-func (g *Game) handleComputerTurn() (AttackResult, error) {
+func (g *Game) HandleComputerTurn() (AttackResult, error) {
 	computer := g.CurrentPlayer
 	enemyBoard := computer.EnemyBoard
 	var targetPoint Point

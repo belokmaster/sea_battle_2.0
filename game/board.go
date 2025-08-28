@@ -2,7 +2,6 @@ package game
 
 import (
 	"errors"
-	"fmt"
 	"math/rand"
 )
 
@@ -139,40 +138,4 @@ func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
 		}
 		return ResultMiss, errors.New("ошибка состояния: клетка корабля есть, а самого корабля нет")
 	}
-}
-
-func (b *Board) printField(isEnemyView bool) {
-	fmt.Println()
-	fmt.Print("    ")
-	for c := 0; c < 10; c++ {
-		fmt.Printf("%c  ", 'A'+c)
-	}
-	fmt.Println()
-
-	for i := 0; i < 10; i++ {
-		fmt.Printf("%2d  ", i)
-		for j := 0; j < 10; j++ {
-			cell := b.Grid[i][j]
-			char := ""
-			switch cell {
-			case HitCell:
-				char = "X  "
-			case MissCell:
-				char = "o  "
-			case EmptyCell:
-				char = ".  "
-			case ShipCell:
-				if isEnemyView {
-					char = ".  "
-				} else {
-					char = "■  "
-				}
-			default:
-				char = "?  "
-			}
-			fmt.Print(char)
-		}
-		fmt.Println()
-	}
-	fmt.Println()
 }

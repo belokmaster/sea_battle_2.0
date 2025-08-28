@@ -8,6 +8,7 @@ import (
 func (a *ArtilleryStrike) Apply(g *Game) string {
 	enemyBoard := g.CurrentPlayer.EnemyBoard
 	enemyLivesCells := []Point{}
+
 	for i := 0; i < 10; i++ {
 		for j := 0; j < 10; j++ {
 			cellStatus := enemyBoard.Grid[i][j]
@@ -34,21 +35,14 @@ func (a *ArtilleryStrike) Name() string {
 }
 
 func (s *Scanner) Apply(g *Game) string {
+	return "Для использования сканера необходимо указать координаты"
+}
+
+func (s *Scanner) ApplyWithTarget(g *Game, target Point) string {
 	enemyBoard := g.CurrentPlayer.EnemyBoard
 	countShips := 0
 
-	var x, y int
-	for {
-		fmt.Print("Введите центральную координату сканирования (X Y): ")
-		n, err := fmt.Scan(&x, &y)
-		if n != 2 || err != nil {
-			fmt.Println("Некорректный ввод. Пожалуйста, введите два числа через пробел.")
-			continue
-		}
-		break
-	}
-
-	scanPoint := Point{X: x, Y: y}
+	scanPoint := target
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
 			checkX, checkY := scanPoint.X+dx, scanPoint.Y+dy

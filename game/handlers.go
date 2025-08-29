@@ -36,10 +36,42 @@ func contains(points []Point, p Point) bool {
 	return false
 }
 
+func (g *Game) findNextTarget() (Point, bool) {
+	computer := g.CurrentPlayer
+	enemyBoard := computer.EnemyBoard
+
+	for _, hitPoint := range computer.TargetHits {
+		directions := []Point{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+
+		for _, dir := range directions {
+			candidate := Point{X: hitPoint.X + dir.X, Y: hitPoint.Y + dir.Y}
+
+			if candidate.X >= 0 && candidate.X < 10 && candidate.Y >= 0 && candidate.Y < 10 {
+				cell := enemyBoard.Grid[candidate.X][candidate.Y]
+				if cell != MissCell && cell != HitCell {
+					return candidate, true
+				}
+			}
+		}
+	}
+
+	var targetPoint Point
+	for {
+		x, y := rand.Intn(10), rand.Intn(10)
+		targetPoint = Point{X: x, Y: y}
+		if contains(computer.VerifiedPoints, targetPoint) || contains(computer.AllHits, targetPoint) {
+			continue
+		}
+		break
+	}
+	return targetPoint, false
+}
+
 func (g *Game) HandleComputerTurn() (AttackResult, error) {
 	computer := g.CurrentPlayer
 	enemyBoard := computer.EnemyBoard
 	var targetPoint Point
+	var flagTarget bool = true
 
 	switch computer.State {
 	case Searching:
@@ -56,43 +88,11 @@ func (g *Game) HandleComputerTurn() (AttackResult, error) {
 		}
 
 	case FinishingOff:
-		targetFound := false
-		for _, hitPoint := range computer.TargetHits {
-			directions := []Point{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
-
-			for _, d := range directions {
-				candidate := Point{X: hitPoint.X + d.X, Y: hitPoint.Y + d.Y}
-
-				if candidate.X < 0 || candidate.X >= 10 || candidate.Y < 0 || candidate.Y >= 10 {
-					continue
-				}
-
-				if contains(computer.AllHits, candidate) || contains(computer.VerifiedPoints, candidate) {
-					continue
-				}
-
-				targetPoint = candidate
-				targetFound = true
-				fmt.Printf("Режим добивания. Бот атакует клетку (%d, %d)\n", targetPoint.X, targetPoint.Y)
-				break
-			}
-
-			if targetFound {
-				break
-			}
-		}
-
-		if !targetFound {
-			fmt.Println("Бот не нашел клетку корабля. Возврат в режим поиска.")
-			computer.State = Searching
-			for {
-				x, y := rand.Intn(10), rand.Intn(10)
-				targetPoint = Point{X: x, Y: y}
-				if contains(computer.VerifiedPoints, targetPoint) || contains(computer.AllHits, targetPoint) {
-					continue
-				}
-				break
-			}
+		targetPoint, flagTarget = g.findNextTarget()
+		if flagTarget {
+			fmt.Printf("Режим добивания. Бот атакует клетку (%d, %d)\n", targetPoint.X, targetPoint.Y)
+		} else {
+			fmt.Printf("Режим поиска. Бот атакует клетку (%d, %d)\n", targetPoint.X, targetPoint.Y)
 		}
 	}
 
@@ -104,14 +104,25 @@ func (g *Game) HandleComputerTurn() (AttackResult, error) {
 	switch result {
 	case ResultHit:
 		computer.AllHits = append(computer.AllHits, targetPoint)
-		computer.TargetHits = append(computer.TargetHits, targetPoint)
 		computer.State = FinishingOff
+
+		if computer.State == FinishingOff && !flagTarget {
+			computer.TargetHits = []Point{targetPoint} // новое добивание
+		} else {
+			computer.TargetHits = append(computer.TargetHits, targetPoint)
+		}
 	case ResultSunk:
 		computer.AllHits = append(computer.AllHits, targetPoint)
 		computer.TargetHits = []Point{}
 		computer.State = Searching
 	case ResultMiss:
 		computer.VerifiedPoints = append(computer.VerifiedPoints, targetPoint)
+
+		if computer.State == FinishingOff && !flagTarget {
+			fmt.Println("Случайный выстрел в режиме добивания был промахом. Сброс цели")
+			computer.TargetHits = []Point{} // забытие старой цели
+			computer.State = Searching
+		}
 	}
 	return result, nil
 }

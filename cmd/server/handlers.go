@@ -14,11 +14,46 @@ func gameStatusHandler(w http.ResponseWriter, r *http.Request) {
 	gameMutex.Lock()
 	defer gameMutex.Unlock()
 
+	response := struct {
+		Game       *game.Game `json:"game"`
+		SaveExists bool       `json:"save_exists"`
+	}{
+		Game:       currentGame,
+		SaveExists: saveExists,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	err := json.NewEncoder(w).Encode(currentGame)
-	if err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Ошибка кодирования состояния игры", http.StatusInternalServerError)
 	}
+}
+
+func loadGameHandler(w http.ResponseWriter, r *http.Request) {
+	gameMutex.Lock()
+	defer gameMutex.Unlock()
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !saveExists {
+		http.Error(w, "Файл сохранения не найден.", http.StatusNotFound)
+		return
+	}
+
+	loadedGame, err := game.LoadGame(saveFilename)
+	if err != nil {
+		http.Error(w, "Не удалось загрузить игру: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	currentGame = loadedGame
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Игра успешно загружена.",
+	})
 }
 
 func newGameHandler(w http.ResponseWriter, r *http.Request) {
@@ -178,17 +213,24 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if currentGame.CurrentPlayer.MyBoard.AllShipSunk() {
+		handleGameOver(w, result, abilityResultMessage, currentGame)
+		currentGame = game.NewGame()
+		return
+	}
+
 	if result == game.ResultMiss {
 		currentGame.SwitchPlayer()
 		for {
-			if currentGame.CurrentPlayer.EnemyBoard.AllShipSunk() {
-				msg = "Игра окончена. Вы проиграли"
-				break
-			}
-
 			result, err := currentGame.HandleComputerTurn()
 			if err != nil {
 				http.Error(w, "Ошибка в ходе бота: "+err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			if currentGame.CurrentPlayer.EnemyBoard.AllShipSunk() {
+				handleGameOver(w, result, abilityResultMessage, currentGame)
+				currentGame = game.NewGame()
 				return
 			}
 
@@ -207,8 +249,44 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 		"attack_result":  fmt.Sprintf("%v", result),
 		"message":        msg,
 		"ability_result": abilityResultMessage,
+		"game_over":      false,
+		"winner":         "",
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
+}
+
+func handleGameOver(w http.ResponseWriter, result game.AttackResult, abilityResultMessage string, currentGame *game.Game) {
+	msg := fmt.Sprintf("Победа. Все корабли противника потоплены. Победитель: %s", currentGame.CurrentPlayer.Name)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"attack_result":  fmt.Sprintf("%v", result),
+		"message":        msg,
+		"ability_result": abilityResultMessage,
+		"game_over":      true,
+		"winner":         currentGame.CurrentPlayer.Name,
+	})
+}
+
+func saveGameHandler(w http.ResponseWriter, r *http.Request) {
+	gameMutex.Lock()
+	defer gameMutex.Unlock()
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := currentGame.SaveGame(saveFilename)
+	if err != nil {
+		http.Error(w, "Не удалось сохранить игру: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "Игра успешно сохранена",
+	})
 }

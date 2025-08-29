@@ -10,6 +10,8 @@ func newRouter() *http.ServeMux {
 	apiMux.HandleFunc("/newgame", newGameHandler)
 	apiMux.HandleFunc("/attack", attackHandler)
 	apiMux.HandleFunc("/ability", abilityHandler)
+	apiMux.HandleFunc("/save", saveGameHandler)
+	apiMux.HandleFunc("/load", loadGameHandler)
 
 	mux.Handle("/api/", http.StripPrefix("/api", apiMux))
 

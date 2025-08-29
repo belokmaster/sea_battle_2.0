@@ -1,0 +1,94 @@
+body {
+    font-family: sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    display: flex;
+    gap: 40px;
+    margin: 20px;
+}
+
+.board-container h2 {
+    text-align: center;
+}
+
+.board {
+    border-collapse: collapse;
+    border: 2px solid #333;
+}
+
+.board td {
+    width: 35px;
+    height: 35px;
+    border: 1px solid #ccc;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 20px;
+}
+
+.cell-empty {
+    background-color: #eef7ff;
+}
+
+.cell-ship {
+    background-color: #777;
+}
+
+.cell-miss {
+    background-color: #cde4fa;
+    content: '•';
+}
+
+.cell-hit {
+    background-color: #ff8a80;
+    content: '✕';
+}
+
+#enemy-board .cell-empty,
+#enemy-board .cell-ship {
+    cursor: pointer;
+}
+
+#enemy-board .cell-empty:hover,
+#enemy-board .cell-ship:hover {
+    background-color: #aae0ff;
+}
+
+#message-area {
+    margin: 20px;
+    padding: 10px;
+    min-height: 40px;
+    width: 600px;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.controls button {
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+}
+
+#abilities-area {
+    width: 600px;
+}
+
+#abilities-list li {
+    background: #e9ecef;
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 3px;
+}

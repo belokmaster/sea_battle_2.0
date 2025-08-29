@@ -14,17 +14,40 @@ import (
 var currentGame *game.Game
 var gameMutex = &sync.Mutex{}
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	currentGame = game.NewGame()
-	http.HandleFunc("/game", gameStatusHandler)
-	http.HandleFunc("/newgame", newGameHandler)
-	http.HandleFunc("/attack", attackHandler)
-	http.HandleFunc("/ability", abilityHandler)
+	mux := http.NewServeMux()
+
+	apiMux := http.NewServeMux()
+	apiMux.HandleFunc("/game", gameStatusHandler)
+	apiMux.HandleFunc("/newgame", newGameHandler)
+	apiMux.HandleFunc("/attack", attackHandler)
+	apiMux.HandleFunc("/ability", abilityHandler)
+
+	mux.Handle("/api/", http.StripPrefix("/api", apiMux))
+
+	fileServer := http.FileServer(http.Dir("."))
+	mux.Handle("/", fileServer)
 
 	port := ":8080"
 	fmt.Printf("Сервер запущен на порту %s\n", port)
 
-	log.Fatal(http.ListenAndServe(port, nil))
+	log.Fatal(http.ListenAndServe(port, corsMiddleware(mux)))
 }
 
 func gameStatusHandler(w http.ResponseWriter, r *http.Request) {

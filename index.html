@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Морской Бой</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Морской Бой</h1>
+
+    <div class="controls">
+        <button id="new-game-button">Новая игра</button>
+    </div>
+
+    <div id="message-area">Загрузка игры...</div>
+    
+    <div class="container">
+        <div class="board-container">
+            <h2>Ваше поле</h2>
+            <table id="player-board" class="board"></table>
+        </div>
+        <div class="board-container">
+            <h2>Поле противника</h2>
+            <table id="enemy-board" class="board"></table>
+        </div>
+    </div>
+    
+    <div id="abilities-area">
+        <h2>Ваши способности</h2>
+        <ul id="abilities-list"></ul>
+    </div>
+
+    <script src="app.js" defer></script>
+</body>
+</html>

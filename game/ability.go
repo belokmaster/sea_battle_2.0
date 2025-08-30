@@ -46,7 +46,8 @@ func (s *Scanner) ApplyWithTarget(g *Game, target Point) string {
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
 			checkX, checkY := scanPoint.X+dx, scanPoint.Y+dy
-			if checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10 {
+			candidate := Point{X: checkX, Y: checkY}
+			if candidate.IsValidPoint() {
 				currentPointStatus := enemyBoard.Grid[checkX][checkY]
 				if currentPointStatus == ShipCell {
 					countShips++

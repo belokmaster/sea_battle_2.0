@@ -97,45 +97,56 @@ func (b *Board) markSunkShip(ship *Ship) []Point {
 	return markedCells
 }
 
-func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, error) {
+func (b *Board) Attack(p *Point, attacker *Player) (AttackResult, []Point, error) {
 	if p.X < 0 || p.X >= 10 || p.Y < 0 || p.Y >= 10 {
-		return ResultMiss, errors.New("атака вне поля")
+		return ResultMiss, nil, errors.New("атака вне поля")
 	}
 
 	currentSquare := b.Grid[p.X][p.Y]
 	if currentSquare == MissCell || currentSquare == HitCell {
-		return ResultMiss, errors.New("по этой клетке уже стреляли")
-	} else if currentSquare == EmptyCell {
+		return ResultMiss, nil, errors.New("по этой клетке уже стреляли")
+	}
+
+	if currentSquare == EmptyCell {
 		b.Grid[p.X][p.Y] = MissCell
-		return ResultMiss, nil
-	} else {
-		b.Grid[p.X][p.Y] = HitCell
-		for i := range b.Ships {
-			ship := &b.Ships[i]
-			for j := 0; j < ship.Size; j++ {
-				x, y := ship.Position[j].X, ship.Position[j].Y
-				if p.X == x && p.Y == y {
-					ship.Hits++
+		return ResultMiss, nil, nil
+	}
 
-					if attacker.HasDoubleDamage {
-						// тут логику с дабл демеджом сделать. пока он бесполезен
-						attacker.HasDoubleDamage = false
-					}
+	b.Grid[p.X][p.Y] = HitCell
+	for i := range b.Ships {
+		ship := &b.Ships[i]
 
-					if ship.Hits >= ship.Size {
-						ship.IsSunk = true
-						markedCells := b.markSunkShip(ship)
-
-						if observer, ok := interface{}(attacker).(AttackObserver); ok {
-							observer.ShipSunk(markedCells)
-						}
-
-						return ResultSunk, nil
-					}
-					return ResultHit, nil
-				}
+		isTargetShip := false
+		for j := 0; j < len(ship.Position); j++ {
+			if p.X == ship.Position[j].X && p.Y == ship.Position[j].Y {
+				isTargetShip = true
+				break
 			}
 		}
-		return ResultMiss, errors.New("ошибка состояния: клетка корабля есть, а самого корабля нет")
+
+		if isTargetShip {
+			ship.Hits++
+
+			if attacker.HasDoubleDamage {
+				// if ship.Hits < ship.Size {
+				// 	ship.Hits++
+				// } // изменить логику
+				attacker.HasDoubleDamage = false
+			}
+
+			if ship.Hits >= ship.Size {
+				ship.IsSunk = true
+				markedCells := b.markSunkShip(ship)
+
+				if observer, ok := interface{}(attacker).(AttackObserver); ok {
+					observer.ShipSunk(markedCells)
+				}
+
+				return ResultSunk, markedCells, nil
+			}
+			return ResultHit, nil, nil
+		}
 	}
+
+	return ResultMiss, nil, errors.New("ошибка состояния: клетка корабля есть, а самого корабля нет")
 }

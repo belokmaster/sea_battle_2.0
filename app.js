@@ -8,31 +8,35 @@ const abilitiesListEl = document.getElementById('abilities-list');
 const saveGameButton = document.getElementById('save-game-button');
 const loadGameButton = document.getElementById('load-game-button');
 
+let isAnimating = false;
+
 async function updateGameView() {
     try {
         const response = await fetch(`${API_URL}/game`);
-        if (!response.ok) {
-            throw new Error('Не удалось загрузить состояние игры (сервер недоступен?)');
-        }
-
         const data = await response.json();
+        if (!response.ok) throw new Error("Не удалось загрузить игру");
         const gameState = data.game;
 
         renderBoard(playerBoardEl, gameState.Player1.MyBoard.Grid, false);
         renderBoard(enemyBoardEl, gameState.Player2.MyBoard.Grid, true);
-
         updateMessage(gameState);
         updateAbilities(gameState.Player1.Abilities);
 
-        if (data.save_exists) {
-            loadGameButton.style.display = 'inline-block';
-        } else {
-            loadGameButton.style.display = 'none';
+        loadGameButton.style.display = data.save_exists ? 'inline-block' : 'none';
+        document.querySelectorAll('.board').forEach(b => b.style.opacity = '1');
+        isAnimating = false;
+
+        if (gameState.CurrentPlayer.Name === 'Computer') {
+            await handleComputerMoves();
         }
 
     } catch (error) {
         messageAreaEl.textContent = `Ошибка: ${error.message}`;
     }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function renderBoard(tableElement, grid, isEnemy) {
@@ -81,73 +85,104 @@ function updateAbilities(abilities) {
 }
 
 async function handleAttackClick(x, y) {
-    try {
-        messageAreaEl.textContent = `Атакуем клетку (${x}, ${y})...`;
-        const response = await fetch(`${API_URL}/attack?x=${x}&y=${y}`, { method: 'POST' });
+    if (isAnimating) return;
+    isAnimating = true;
+    messageAreaEl.textContent = `Атакуем клетку (${x}, ${y})...`;
 
+    try {
+        const response = await fetch(`${API_URL}/attack?x=${x}&y=${y}`, { method: 'POST' });
         const result = await response.json();
         if (!response.ok) throw new Error(result.Message || 'Неизвестная ошибка атаки');
 
-        let fullMessage = result.message;
-        if (result.ability_result) {
-            fullMessage += ` | ${result.ability_result}`;
+        if (result.human_move_result) {
+            await animateMove(enemyBoardEl, result.human_move_result, false);
         }
-        messageAreaEl.textContent = fullMessage;
 
-        await updateGameView();
+        if (result.computer_moves && result.computer_moves.length > 0) {
+            for (const move of result.computer_moves) {
+                await sleep(800);
+                await animateMove(playerBoardEl, move, true);
+            }
+        }
+
+        const finalStateResponse = await fetch(`${API_URL}/game`);
+        const finalData = await finalStateResponse.json();
+        updateMessage(finalData.game);
+        updateAbilities(finalData.game.Player1.Abilities);
+
+        messageAreaEl.textContent = result.message;
 
         if (result.game_over) {
-            messageAreaEl.textContent = `Игра окончена! Победитель: ${result.winner}`;
-            document.querySelectorAll('.board').forEach(b => b.style.opacity = '0.5');
+            handleGameOver(result.winner);
+        } else {
+            isAnimating = false;
         }
 
     } catch (error) {
         messageAreaEl.textContent = `Ошибка: ${error.message}`;
-        await updateGameView();
+        isAnimating = false;
     }
+}
+
+async function animateMove(boardElement, move, isPlayerBoard) {
+    if (!move) return;
+    const cell = boardElement.rows[move.x].cells[move.y];
+
+    cell.replaceWith(cell.cloneNode(true));
+    const newCell = boardElement.rows[move.x].cells[move.y];
+
+    const highlightClass = isPlayerBoard ? 'cell-attacked-by-bot' : 'cell-attacked-by-player';
+    newCell.classList.add(highlightClass);
+    messageAreaEl.textContent = `${isPlayerBoard ? 'Компьютер' : 'Вы'} атакует (${move.x}, ${move.y})...`;
+    await sleep(400);
+
+    if (move.result === 0) {
+        newCell.className = 'cell-miss';
+        newCell.textContent = '•';
+    } else {
+        newCell.className = 'cell-hit';
+        newCell.textContent = '✕';
+    }
+
+    await sleep(600);
+
+    if (move.result === 2 && move.marked_points) {
+        messageAreaEl.textContent = "Потопил!";
+        for (const p of move.marked_points) {
+            const markedCell = boardElement.rows[p.X].cells[p.Y];
+            if (markedCell.className === 'cell-empty' || markedCell.className === 'cell-ship') {
+                markedCell.className = 'cell-miss';
+                markedCell.textContent = '•';
+                await sleep(50);
+            }
+        }
+    }
+}
+
+function handleGameOver(winner) {
+    messageAreaEl.textContent = `Игра окончена! Победитель: ${winner}`;
+    document.querySelectorAll('.board').forEach(b => b.style.opacity = '0.5');
+    isAnimating = true;
 }
 
 async function handleNewGameClick() {
-    try {
-        messageAreaEl.textContent = 'Создание новой игры...';
-        const response = await fetch(`${API_URL}/newgame`, { method: 'POST' });
-        if (!response.ok) throw new Error('Не удалось начать новую игру');
-
-        await updateGameView();
-        messageAreaEl.textContent = "Новая игра началась. Ваш ход.";
-    } catch (error) {
-        messageAreaEl.textContent = `Ошибка: ${error.message}`;
-    }
+    if (isAnimating) return;
+    isAnimating = true;
+    const response = await fetch(`${API_URL}/newgame`, { method: 'POST' });
+    if (response.ok) await updateGameView();
 }
 
 async function handleSaveGameClick() {
-    try {
-        messageAreaEl.textContent = 'Сохранение игры...';
-        const response = await fetch(`${API_URL}/save`, { method: 'POST' });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || 'Ошибка сохранения');
-
-        messageAreaEl.textContent = result.message;
-        await updateGameView();
-    } catch (error) {
-        messageAreaEl.textContent = `Ошибка: ${error.message}`;
-    }
+    if (isAnimating) return;
+    const response = await fetch(`${API_URL}/save`, { method: 'POST' });
+    if (response.ok) await updateGameView();
 }
 
 async function handleLoadGameClick() {
-    try {
-        messageAreaEl.textContent = 'Загрузка игры...';
-        const response = await fetch(`${API_URL}/load`, { method: 'POST' });
-
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message || 'Ошибка загрузки');
-
-        await updateGameView();
-        messageAreaEl.textContent = result.message;
-    } catch (error) {
-        messageAreaEl.textContent = `Ошибка: ${error.message}`;
-    }
+    if (isAnimating) return;
+    isAnimating = true;
+    const response = await fetch(`${API_URL}/load`, { method: 'POST' });
+    if (response.ok) await updateGameView();
 }
 
 newGameButton.addEventListener('click', handleNewGameClick);

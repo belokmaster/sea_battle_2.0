@@ -5,12 +5,12 @@ import (
 	"math/rand"
 )
 
-func (g *Game) HandleHumanTurn(x, y int) (AttackResult, string, error) {
+func (g *Game) HandleHumanTurn(x, y int) (AttackResult, []Point, string, error) {
 	attackPoint := Point{X: x, Y: y}
-	result, err := g.CurrentPlayer.EnemyBoard.Attack(&attackPoint, g.CurrentPlayer)
+	result, markedPoints, err := g.CurrentPlayer.EnemyBoard.Attack(&attackPoint, g.CurrentPlayer)
 	if err != nil {
 		fmt.Println("Ошибка:", err)
-		return ResultMiss, "", err
+		return ResultMiss, nil, "", err
 	}
 
 	var msg string
@@ -24,7 +24,7 @@ func (g *Game) HandleHumanTurn(x, y int) (AttackResult, string, error) {
 		msg = "Промах! Ход переходит"
 	}
 
-	return result, msg, nil
+	return result, markedPoints, msg, nil
 }
 
 func contains(points []Point, p Point) bool {
@@ -38,98 +38,109 @@ func contains(points []Point, p Point) bool {
 
 func (g *Game) findNextTarget() (Point, bool) {
 	computer := g.CurrentPlayer
-	enemyBoard := computer.EnemyBoard
+
+	availableTargets := g.findAvailableTargets(computer)
+	if len(availableTargets) > 0 {
+		randInd := rand.Intn(len(availableTargets))
+		return availableTargets[randInd], true
+	}
+
+	targetPoint := g.searchingNewTarget()
+	return targetPoint, false
+}
+
+func (g *Game) findAvailableTargets(computer *Player) []Point {
+	var availableTargets []Point
+
+	attackedSet := make(map[Point]bool)
+	for _, p := range computer.AllHits {
+		attackedSet[p] = true
+	}
+	for _, p := range computer.VerifiedPoints {
+		attackedSet[p] = true
+	}
 
 	for _, hitPoint := range computer.TargetHits {
 		directions := []Point{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
-
 		for _, dir := range directions {
 			candidate := Point{X: hitPoint.X + dir.X, Y: hitPoint.Y + dir.Y}
-
-			if candidate.X >= 0 && candidate.X < 10 && candidate.Y >= 0 && candidate.Y < 10 {
-				cell := enemyBoard.Grid[candidate.X][candidate.Y]
-				if cell != MissCell && cell != HitCell {
-					return candidate, true
+			if candidate.IsValidPoint() {
+				if !attackedSet[candidate] {
+					availableTargets = append(availableTargets, candidate)
 				}
 			}
 		}
 	}
 
+	return availableTargets
+}
+
+func (g *Game) searchingNewTarget() Point {
 	var targetPoint Point
+	computer := g.CurrentPlayer
 	for {
 		x, y := rand.Intn(10), rand.Intn(10)
 		targetPoint = Point{X: x, Y: y}
-		if contains(computer.VerifiedPoints, targetPoint) || contains(computer.AllHits, targetPoint) {
-			continue
-		}
-		break
-	}
-	return targetPoint, false
-}
 
-func (g *Game) HandleComputerTurn() (AttackResult, error) {
-	computer := g.CurrentPlayer
-	enemyBoard := computer.EnemyBoard
-	var targetPoint Point
-	var flagTarget bool = true
-
-	switch computer.State {
-	case Searching:
-		for {
-			x, y := rand.Intn(10), rand.Intn(10)
-			targetPoint = Point{X: x, Y: y}
-
-			if contains(computer.AllHits, targetPoint) || contains(computer.VerifiedPoints, targetPoint) {
-				continue
-			}
-
+		if !contains(computer.AllHits, targetPoint) && !contains(computer.VerifiedPoints, targetPoint) {
 			fmt.Printf("Режим поиска. Бот атакует клетку (%d, %d)\n", targetPoint.X, targetPoint.Y)
 			break
 		}
+	}
+	return targetPoint
+}
 
-	case FinishingOff:
-		targetPoint, flagTarget = g.findNextTarget()
-		if flagTarget {
-			fmt.Printf("Режим добивания. Бот атакует клетку (%d, %d)\n", targetPoint.X, targetPoint.Y)
-		} else {
-			fmt.Printf("Режим поиска. Бот атакует клетку (%d, %d)\n", targetPoint.X, targetPoint.Y)
-		}
+func (g *Game) HandleComputerTurn() (Point, AttackResult, []Point, error) {
+	computer := g.CurrentPlayer
+
+	var targetPoint Point
+	if computer.State == FinishingOff && len(computer.TargetHits) > 0 {
+		targetPoint, _ = g.findNextTarget()
+	} else {
+		targetPoint = g.searchingNewTarget()
+		computer.State = Searching
 	}
 
-	result, err := enemyBoard.Attack(&targetPoint, computer)
+	result, newlyMarkedPoints, err := computer.EnemyBoard.Attack(&targetPoint, computer)
 	if err != nil {
-		return ResultMiss, err
+		return targetPoint, ResultMiss, nil, err
 	}
 
 	switch result {
 	case ResultHit:
 		computer.AllHits = append(computer.AllHits, targetPoint)
+		computer.TargetHits = append(computer.TargetHits, targetPoint)
 		computer.State = FinishingOff
 
-		if computer.State == FinishingOff && !flagTarget {
-			computer.TargetHits = []Point{targetPoint} // новое добивание
-		} else {
-			computer.TargetHits = append(computer.TargetHits, targetPoint)
-		}
 	case ResultSunk:
 		computer.AllHits = append(computer.AllHits, targetPoint)
+		g.CurrentPlayer.shipSunkBot(newlyMarkedPoints)
+
 		computer.TargetHits = []Point{}
 		computer.State = Searching
+
 	case ResultMiss:
 		computer.VerifiedPoints = append(computer.VerifiedPoints, targetPoint)
 
-		if computer.State == FinishingOff && !flagTarget {
-			fmt.Println("Случайный выстрел в режиме добивания был промахом. Сброс цели")
-			computer.TargetHits = []Point{} // забытие старой цели
+		if computer.State == FinishingOff && len(g.findAvailableTargets(computer)) == 0 {
+			computer.TargetHits = []Point{}
 			computer.State = Searching
 		}
 	}
-	return result, nil
+
+	return targetPoint, result, newlyMarkedPoints, nil
 }
 
-func (p *Player) ShipSunkBot(makedPoints []Point) {
+func (p *Player) shipSunkBot(makedPoints []Point) {
 	if p.Name == "Computer" {
-		p.VerifiedPoints = append(p.VerifiedPoints, makedPoints...)
-		fmt.Printf("Бот обновил данные после потопления корабля")
+		for _, mp := range makedPoints {
+			if !contains(p.VerifiedPoints, mp) {
+				p.VerifiedPoints = append(p.VerifiedPoints, mp)
+			}
+		}
 	}
+}
+
+func (p Point) IsValidPoint() bool {
+	return p.X >= 0 && p.X < 10 && p.Y >= 0 && p.Y < 10
 }

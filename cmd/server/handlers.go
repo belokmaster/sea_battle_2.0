@@ -8,24 +8,25 @@ import (
 	"net/url"
 	"sea_battle/game"
 	"strconv"
+	"time"
 )
+
+func sendJSON(w http.ResponseWriter, data interface{}, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(data)
+}
+
+func sendJSONError(w http.ResponseWriter, message string, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]string{"Message": message})
+}
 
 func gameStatusHandler(w http.ResponseWriter, r *http.Request) {
 	gameMutex.Lock()
 	defer gameMutex.Unlock()
-
-	response := struct {
-		Game       *game.Game `json:"game"`
-		SaveExists bool       `json:"save_exists"`
-	}{
-		Game:       currentGame,
-		SaveExists: saveExists,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Ошибка кодирования состояния игры", http.StatusInternalServerError)
-	}
+	sendJSON(w, map[string]interface{}{"game": currentGame, "save_exists": saveExists}, http.StatusOK)
 }
 
 func loadGameHandler(w http.ResponseWriter, r *http.Request) {
@@ -33,42 +34,34 @@ func loadGameHandler(w http.ResponseWriter, r *http.Request) {
 	defer gameMutex.Unlock()
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
 		return
 	}
 
 	if !saveExists {
-		http.Error(w, "Файл сохранения не найден.", http.StatusNotFound)
+		sendJSONError(w, "Файл сохранения не найден", http.StatusNotFound)
 		return
 	}
 
 	loadedGame, err := game.LoadGame(saveFilename)
 	if err != nil {
-		http.Error(w, "Не удалось загрузить игру: "+err.Error(), http.StatusInternalServerError)
+		sendJSONError(w, "Не удалось загрузить игру: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	currentGame = loadedGame
-
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Игра успешно загружена.",
-	})
+	sendJSON(w, map[string]string{"message": "Игра успешно загружена"}, http.StatusOK)
 }
 
 func newGameHandler(w http.ResponseWriter, r *http.Request) {
 	gameMutex.Lock()
 	defer gameMutex.Unlock()
-
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
 		return
 	}
-
 	currentGame = game.NewGame()
-
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "Новая игра успешно создана")
+	sendJSON(w, map[string]string{"message": "Новая игра успешно создана"}, http.StatusOK)
 }
 
 func applyAbility(query url.Values) (string, error) {
@@ -124,21 +117,22 @@ func abilityHandler(w http.ResponseWriter, r *http.Request) {
 	defer gameMutex.Unlock()
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
 		return
 	}
 
-	if currentGame.CurrentPlayer != currentGame.Player1 {
-		http.Error(w, "Сейчас не ваш ход", http.StatusForbidden)
+	if currentGame.CurrentPlayer.Name != "Player" {
+		sendJSONError(w, "Сейчас не ваш ход", http.StatusForbidden)
 		return
 	}
 
 	resultMessage, err := applyAbility(r.URL.Query())
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		sendJSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
+	// тут юз sendJson
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"success": true,
@@ -147,11 +141,6 @@ func abilityHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandlerCoords(w http.ResponseWriter, r *http.Request) (int, int, error) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
-		return 0, 0, fmt.Errorf("метод не разрешен")
-	}
-
 	query := r.URL.Query()
 	xStr := query.Get("x")
 	yStr := query.Get("y")
@@ -178,12 +167,12 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 	defer gameMutex.Unlock()
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
 		return
 	}
 
-	if currentGame.CurrentPlayer != currentGame.Player1 {
-		http.Error(w, "Сейчас не ваш ход", http.StatusForbidden)
+	if currentGame.CurrentPlayer.Name != "Player" {
+		sendJSONError(w, "Сейчас не ваш ход", http.StatusForbidden)
 		return
 	}
 
@@ -194,42 +183,55 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 		var err error
 		abilityResultMessage, err = applyAbility(query)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			sendJSONError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 	}
 
 	x, y, err := HandlerCoords(w, r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		sendJSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var msg string
-	result, msg, err := currentGame.HandleHumanTurn(x, y)
-
+	result, markedPoints, msg, err := currentGame.HandleHumanTurn(x, y)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		sendJSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if currentGame.CurrentPlayer.MyBoard.AllShipSunk() {
-		handleGameOver(w, result, abilityResultMessage, currentGame)
+	if currentGame.Player2.MyBoard.AllShipSunk() {
+		response := handlerGameOver(abilityResultMessage, currentGame.Player1)
+		sendJSON(w, response, http.StatusOK)
 		currentGame = game.NewGame()
 		return
 	}
 
+	var computerMoves []map[string]interface{}
+
 	if result == game.ResultMiss {
 		currentGame.SwitchPlayer()
 		for {
-			result, err := currentGame.HandleComputerTurn()
+			time.Sleep(300 * time.Millisecond)
+
+			compTarget, result, newlyMarked, err := currentGame.HandleComputerTurn()
 			if err != nil {
-				http.Error(w, "Ошибка в ходе бота: "+err.Error(), http.StatusInternalServerError)
+				sendJSONError(w, "Ошибка в ходе бота: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
 
-			if currentGame.CurrentPlayer.EnemyBoard.AllShipSunk() {
-				handleGameOver(w, result, abilityResultMessage, currentGame)
+			computerMoves = append(computerMoves, map[string]interface{}{
+				"x":             compTarget.X,
+				"y":             compTarget.Y,
+				"result":        result,
+				"marked_points": newlyMarked,
+			})
+			log.Printf("Ход компьютера: %+v, Результат: %v", compTarget, result)
+
+			if currentGame.Player1.MyBoard.AllShipSunk() {
+				response := handlerGameOver(abilityResultMessage, currentGame.Player2)
+				sendJSON(w, response, http.StatusOK)
 				currentGame = game.NewGame()
 				return
 			}
@@ -246,28 +248,29 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := map[string]interface{}{
-		"attack_result":  fmt.Sprintf("%v", result),
 		"message":        msg,
 		"ability_result": abilityResultMessage,
 		"game_over":      false,
 		"winner":         "",
+		"computer_moves": computerMoves,
+		"human_move_result": map[string]interface{}{
+			"x":             x,
+			"y":             y,
+			"result":        result,
+			"marked_points": markedPoints,
+		},
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	sendJSON(w, response, http.StatusOK)
 }
 
-func handleGameOver(w http.ResponseWriter, result game.AttackResult, abilityResultMessage string, currentGame *game.Game) {
-	msg := fmt.Sprintf("Победа. Все корабли противника потоплены. Победитель: %s", currentGame.CurrentPlayer.Name)
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"attack_result":  fmt.Sprintf("%v", result),
+func handlerGameOver(abilityResultMessage string, winner *game.Player) map[string]interface{} {
+	msg := fmt.Sprintf("Игра окончена! Победитель: %s", winner.Name)
+	return map[string]interface{}{
 		"message":        msg,
 		"ability_result": abilityResultMessage,
 		"game_over":      true,
-		"winner":         currentGame.CurrentPlayer.Name,
-	})
+		"winner":         winner.Name,
+	}
 }
 
 func saveGameHandler(w http.ResponseWriter, r *http.Request) {
@@ -275,18 +278,15 @@ func saveGameHandler(w http.ResponseWriter, r *http.Request) {
 	defer gameMutex.Unlock()
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
 		return
 	}
 
 	err := currentGame.SaveGame(saveFilename)
 	if err != nil {
-		http.Error(w, "Не удалось сохранить игру: "+err.Error(), http.StatusInternalServerError)
+		sendJSONError(w, "Не удалось сохранить игру: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Игра успешно сохранена",
-	})
+	sendJSON(w, map[string]string{"message": "Игра успешно сохранена"}, http.StatusOK)
 }

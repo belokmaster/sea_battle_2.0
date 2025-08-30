@@ -92,3 +92,9 @@ body {
     margin: 5px 0;
     border-radius: 3px;
 }
+
+.cell-attacked-by-player {
+    background-color: #aae0ff !important;
+    transform: scale(1.1);
+    transition: transform 0.2s;
+}

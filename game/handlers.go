@@ -64,10 +64,8 @@ func (g *Game) findAvailableTargets(computer *Player) []Point {
 		directions := []Point{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
 		for _, dir := range directions {
 			candidate := Point{X: hitPoint.X + dir.X, Y: hitPoint.Y + dir.Y}
-			if candidate.IsValidPoint() {
-				if !attackedSet[candidate] {
-					availableTargets = append(availableTargets, candidate)
-				}
+			if candidate.IsValidPoint() && !attackedSet[candidate] {
+				availableTargets = append(availableTargets, candidate)
 			}
 		}
 	}

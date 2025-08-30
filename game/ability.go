@@ -1,77 +1,107 @@
 package game
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 )
 
-func (a *ArtilleryStrike) Apply(g *Game) string {
+func (a *ArtilleryStrike) Apply(g *Game, target *Point) (*AbilityResult, error) {
 	enemyBoard := g.CurrentPlayer.EnemyBoard
-	enemyLivesCells := []Point{}
+	availableTargets := []Point{}
 
 	for i := 0; i < 10; i++ {
 		for j := 0; j < 10; j++ {
 			cellStatus := enemyBoard.Grid[i][j]
-			if cellStatus == ShipCell {
-				enemyLivesCells = append(enemyLivesCells, Point{X: i, Y: j})
+			if cellStatus == ShipCell || cellStatus == EmptyCell {
+				availableTargets = append(availableTargets, Point{X: i, Y: j})
 			}
 		}
 	}
 
-	if len(enemyLivesCells) == 0 {
-		return "Нет целей для артиллерийского удара"
+	if len(availableTargets) == 0 {
+		return &AbilityResult{Message: "Нет целей для артиллерийского удара"}, nil
 	}
 
-	randomPointInd := rand.Intn(len(enemyLivesCells))
-	randomPoint := enemyLivesCells[randomPointInd]
-	enemyBoard.Attack(&randomPoint, g.CurrentPlayer)
+	randomPointInd := rand.Intn(len(availableTargets))
+	randomPoint := availableTargets[randomPointInd]
 
-	s := fmt.Sprintf("Артиллерийский удар нанесен по клетке (%d, %d)", randomPoint.X, randomPoint.Y)
-	return s
+	result, markedPoints, err := enemyBoard.Attack(&randomPoint, g.CurrentPlayer)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка при использовании артиллерийского удара: %w", err)
+	}
+
+	if result == ResultSunk {
+		g.CurrentPlayer.AddRandomAbility()
+	}
+
+	msg := fmt.Sprintf("Артиллерийский удар нанесен по (%d, %d)", randomPoint.X, randomPoint.Y)
+	return &AbilityResult{
+		Message: msg,
+		AttackResult: &AttackResultData{
+			Target:       randomPoint,
+			Result:       result,
+			MarkedPoints: markedPoints,
+		},
+	}, nil
 }
 
 func (a *ArtilleryStrike) Name() string {
 	return "Артиллерийский удар"
 }
 
-func (s *Scanner) Apply(g *Game) string {
-	return "Для использования сканера необходимо указать координаты"
+func (a *ArtilleryStrike) RequiresTarget() bool {
+	return false
 }
 
-func (s *Scanner) ApplyWithTarget(g *Game, target Point) string {
+func (s *Scanner) Apply(g *Game, target *Point) (*AbilityResult, error) {
+	if target == nil {
+		return nil, errors.New("для сканера необходимо указать координаты")
+	}
+
 	enemyBoard := g.CurrentPlayer.EnemyBoard
 	countShips := 0
+	var affectedPoints []Point
 
-	scanPoint := target
 	for dx := -1; dx <= 1; dx++ {
 		for dy := -1; dy <= 1; dy++ {
-			checkX, checkY := scanPoint.X+dx, scanPoint.Y+dy
+			checkX, checkY := target.X+dx, target.Y+dy
 			candidate := Point{X: checkX, Y: checkY}
 			if candidate.IsValidPoint() {
-				currentPointStatus := enemyBoard.Grid[checkX][checkY]
-				if currentPointStatus == ShipCell {
+				affectedPoints = append(affectedPoints, candidate)
+				if enemyBoard.Grid[checkX][checkY] == ShipCell {
 					countShips++
 				}
 			}
 		}
 	}
 
-	str := fmt.Sprintf("Сканирование области 3x3 в точке (%d, %d)... Обнаружено %d сегментов кораблей.", scanPoint.X, scanPoint.Y, countShips)
-	return str
+	msg := fmt.Sprintf("Сканирование области 3x3 в точке (%d, %d). Обнаружено %d сегментов кораблей", target.X, target.Y, countShips)
+	return &AbilityResult{
+		Message:        msg,
+		AffectedPoints: affectedPoints,
+	}, nil
 }
 
 func (s *Scanner) Name() string {
-	return "Сканнер."
+	return "Сканнер"
 }
 
-func (d *DoubleDamage) Apply(g *Game) string {
+func (s *Scanner) RequiresTarget() bool {
+	return true
+}
+
+func (d *DoubleDamage) Apply(g *Game, target *Point) (*AbilityResult, error) {
 	g.CurrentPlayer.HasDoubleDamage = true
-	s := "Следующая атака нанесет двойной урон!"
-	return s
+	return &AbilityResult{Message: "Следующая атака нанесет двойной урон!"}, nil
 }
 
 func (s *DoubleDamage) Name() string {
-	return "Двойной урон."
+	return "Двойной урон"
+}
+
+func (d *DoubleDamage) RequiresTarget() bool {
+	return false
 }
 
 func (p *Player) AddRandomAbility() {

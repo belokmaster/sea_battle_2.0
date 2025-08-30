@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"sea_battle/game"
 	"strconv"
 	"time"
@@ -27,6 +26,24 @@ func gameStatusHandler(w http.ResponseWriter, r *http.Request) {
 	gameMutex.Lock()
 	defer gameMutex.Unlock()
 	sendJSON(w, map[string]interface{}{"game": currentGame, "save_exists": saveExists}, http.StatusOK)
+}
+
+func saveGameHandler(w http.ResponseWriter, r *http.Request) {
+	gameMutex.Lock()
+	defer gameMutex.Unlock()
+
+	if r.Method != http.MethodPost {
+		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := currentGame.SaveGame(saveFilename)
+	if err != nil {
+		sendJSONError(w, "Не удалось сохранить игру: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	sendJSON(w, map[string]string{"message": "Игра успешно сохранена"}, http.StatusOK)
 }
 
 func loadGameHandler(w http.ResponseWriter, r *http.Request) {
@@ -64,54 +81,6 @@ func newGameHandler(w http.ResponseWriter, r *http.Request) {
 	sendJSON(w, map[string]string{"message": "Новая игра успешно создана"}, http.StatusOK)
 }
 
-func applyAbility(query url.Values) (string, error) {
-	abilityName := query.Get("ability_name")
-	if abilityName == "" {
-		return "", fmt.Errorf("параметр 'ability_name' обязателен")
-	}
-
-	var selectedAbility game.Ability
-	abilityIndex := -1
-	player := currentGame.Player1
-
-	for i, ab := range player.Abilities {
-		var name string
-		switch ab.(type) {
-		case *game.ArtilleryStrike:
-			name = "artillery"
-		case *game.Scanner:
-			name = "scanner"
-		case *game.DoubleDamage:
-			name = "doubledamage"
-		}
-		if name == abilityName {
-			selectedAbility = ab
-			abilityIndex = i
-			break
-		}
-	}
-
-	if selectedAbility == nil {
-		return "", fmt.Errorf("у вас нет такой способности или она не существует")
-	}
-
-	var resultMessage string
-	if scanner, ok := selectedAbility.(*game.Scanner); ok {
-		xStr, yStr := query.Get("ability_x"), query.Get("ability_y")
-		if xStr == "" || yStr == "" {
-			return "", fmt.Errorf("для сканера нужны координаты ability_x и ability_y")
-		}
-		x, _ := strconv.Atoi(xStr)
-		y, _ := strconv.Atoi(yStr)
-		resultMessage = scanner.ApplyWithTarget(currentGame, game.Point{X: x, Y: y})
-	} else {
-		resultMessage = selectedAbility.Apply(currentGame)
-	}
-
-	player.Abilities = append(player.Abilities[:abilityIndex], player.Abilities[abilityIndex+1:]...)
-	return resultMessage, nil
-}
-
 func abilityHandler(w http.ResponseWriter, r *http.Request) {
 	gameMutex.Lock()
 	defer gameMutex.Unlock()
@@ -126,18 +95,56 @@ func abilityHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resultMessage, err := applyAbility(r.URL.Query())
-	if err != nil {
-		sendJSONError(w, err.Error(), http.StatusBadRequest)
+	query := r.URL.Query()
+	abilityName := query.Get("ability_name")
+	if abilityName == "" {
+		sendJSONError(w, "параметр 'ability_name' обязателен", http.StatusBadRequest)
 		return
 	}
 
-	// тут юз sendJson
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": resultMessage,
-	})
+	player := currentGame.Player1
+	var selectedAbility game.Ability
+	abilityIndex := -1
+
+	for i, ab := range player.Abilities {
+		if ab.Name() == abilityName {
+			selectedAbility = ab
+			abilityIndex = i
+			break
+		}
+	}
+
+	if selectedAbility == nil {
+		sendJSONError(w, "у вас нет такой способности или она не существует", http.StatusNotFound)
+		return
+	}
+
+	var target *game.Point
+	if selectedAbility.RequiresTarget() {
+		x, y, err := HandlerCoords(w, r)
+		if err != nil {
+			sendJSONError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		target = &game.Point{X: x, Y: y}
+	}
+
+	result, err := selectedAbility.Apply(currentGame, target)
+	if err != nil {
+		sendJSONError(w, "ошибка применения способности: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	player.Abilities = append(player.Abilities[:abilityIndex], player.Abilities[abilityIndex+1:]...)
+
+	if currentGame.Player2.MyBoard.AllShipSunk() {
+		response := handlerGameOver(result.Message, currentGame.Player1)
+		sendJSON(w, response, http.StatusOK)
+		currentGame = game.NewGame()
+		return
+	}
+
+	sendJSON(w, result, http.StatusOK)
 }
 
 func HandlerCoords(w http.ResponseWriter, r *http.Request) (int, int, error) {
@@ -176,25 +183,12 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := r.URL.Query()
-	var abilityResultMessage string
-
-	if query.Has("ability_name") {
-		var err error
-		abilityResultMessage, err = applyAbility(query)
-		if err != nil {
-			sendJSONError(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-	}
-
 	x, y, err := HandlerCoords(w, r)
 	if err != nil {
 		sendJSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	var msg string
 	result, markedPoints, msg, err := currentGame.HandleHumanTurn(x, y)
 	if err != nil {
 		sendJSONError(w, err.Error(), http.StatusBadRequest)
@@ -202,14 +196,13 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if currentGame.Player2.MyBoard.AllShipSunk() {
-		response := handlerGameOver(abilityResultMessage, currentGame.Player1)
+		response := handlerGameOver("Вы победили!", currentGame.Player1)
 		sendJSON(w, response, http.StatusOK)
 		currentGame = game.NewGame()
 		return
 	}
 
 	var computerMoves []map[string]interface{}
-
 	if result == game.ResultMiss {
 		currentGame.SwitchPlayer()
 		for {
@@ -230,7 +223,7 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Ход компьютера: %+v, Результат: %v", compTarget, result)
 
 			if currentGame.Player1.MyBoard.AllShipSunk() {
-				response := handlerGameOver(abilityResultMessage, currentGame.Player2)
+				response := handlerGameOver("Вы победили!", currentGame.Player2)
 				sendJSON(w, response, http.StatusOK)
 				currentGame = game.NewGame()
 				return
@@ -249,7 +242,6 @@ func attackHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := map[string]interface{}{
 		"message":        msg,
-		"ability_result": abilityResultMessage,
 		"game_over":      false,
 		"winner":         "",
 		"computer_moves": computerMoves,
@@ -271,22 +263,4 @@ func handlerGameOver(abilityResultMessage string, winner *game.Player) map[strin
 		"game_over":      true,
 		"winner":         winner.Name,
 	}
-}
-
-func saveGameHandler(w http.ResponseWriter, r *http.Request) {
-	gameMutex.Lock()
-	defer gameMutex.Unlock()
-
-	if r.Method != http.MethodPost {
-		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
-		return
-	}
-
-	err := currentGame.SaveGame(saveFilename)
-	if err != nil {
-		sendJSONError(w, "Не удалось сохранить игру: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	sendJSON(w, map[string]string{"message": "Игра успешно сохранена"}, http.StatusOK)
 }

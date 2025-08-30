@@ -65,11 +65,24 @@ const (
 	FinishingOff                // добивание подбитого корабля
 )
 
-type Ability interface {
-	Apply(g *Game) string
-	Name() string
+type AbilityResult struct {
+	Message        string            `json:"message"`
+	AffectedPoints []Point           `json:"affected_points,omitempty"`
+	AttackResult   *AttackResultData `json:"attack_result,omitempty"`
+}
+
+type AttackResultData struct {
+	Target       Point        `json:"target"`
+	Result       AttackResult `json:"result"`
+	MarkedPoints []Point      `json:"marked_points,omitempty"`
 }
 
 type ArtilleryStrike struct{}
 type Scanner struct{}
 type DoubleDamage struct{}
+
+type Ability interface {
+	Apply(g *Game, target *Point) (*AbilityResult, error)
+	Name() string
+	RequiresTarget() bool
+}

@@ -4,16 +4,16 @@
   "MyBoard": {
    "Grid": [
     [
-     0,
-     0,
-     0,
-     0,
-     1,
      1,
      0,
+     1,
+     0,
+     2,
      0,
      0,
-     0
+     0,
+     0,
+     2
     ],
     [
      1,
@@ -21,76 +21,16 @@
      0,
      0,
      0,
-     0,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
      1,
      1,
      1,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
      0,
      0
     ],
     [
      1,
      0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
+     2,
      0,
      0,
      0,
@@ -101,23 +41,83 @@
     ],
     [
      0,
+     0,
+     0,
+     2,
+     0,
+     1,
      1,
      0,
      0,
+     1
+    ],
+    [
+     2,
      0,
      0,
      0,
+     2,
+     0,
+     0,
+     2,
+     0,
+     2
+    ],
+    [
      0,
      1,
-     0
+     1,
+     0,
+     1,
+     1,
+     0,
+     2,
+     2,
+     2
     ],
     [
      0,
      0,
      0,
+     0,
+     0,
+     2,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
      1,
      1,
      1,
+     1,
+     0
+    ],
+    [
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
      0,
      0,
      0,
@@ -127,134 +127,22 @@
    "Ships": [
     {
      "Size": 4,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 6
-      },
-      {
-       "X": 4,
-       "Y": 6
-      },
-      {
-       "X": 5,
-       "Y": 6
-      },
-      {
-       "X": 6,
-       "Y": 6
-      }
-     ]
-    },
-    {
-     "Size": 3,
      "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
-       "X": 9,
-       "Y": 3
-      },
-      {
-       "X": 9,
-       "Y": 4
-      },
-      {
-       "X": 9,
+       "X": 8,
        "Y": 5
-      }
-     ]
-    },
-    {
-     "Size": 3,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 1
       },
       {
-       "X": 3,
-       "Y": 2
+       "X": 8,
+       "Y": 6
       },
       {
-       "X": 3,
-       "Y": 3
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 0,
-       "Y": 4
+       "X": 8,
+       "Y": 7
       },
-      {
-       "X": 0,
-       "Y": 5
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 5,
-       "Y": 8
-      },
-      {
-       "X": 6,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 5,
-       "Y": 0
-      },
-      {
-       "X": 6,
-       "Y": 0
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
       {
        "X": 8,
        "Y": 8
@@ -262,14 +150,90 @@
      ]
     },
     {
-     "Size": 1,
-     "IsVertical": true,
+     "Size": 3,
+     "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
        "X": 1,
+       "Y": 5
+      },
+      {
+       "X": 1,
+       "Y": 6
+      },
+      {
+       "X": 1,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 3,
+     "IsVertical": true,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 0,
        "Y": 0
+      },
+      {
+       "X": 1,
+       "Y": 0
+      },
+      {
+       "X": 2,
+       "Y": 0
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 4
+      },
+      {
+       "X": 5,
+       "Y": 5
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 1
+      },
+      {
+       "X": 5,
+       "Y": 2
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 3,
+       "Y": 5
+      },
+      {
+       "X": 3,
+       "Y": 6
       }
      ]
     },
@@ -280,8 +244,44 @@
      "IsSunk": false,
      "Position": [
       {
-       "X": 8,
-       "Y": 1
+       "X": 7,
+       "Y": 2
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": true,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 3,
+       "Y": 9
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": true,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 0,
+       "Y": 2
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 6,
+       "Y": 7
       }
      ]
     }
@@ -290,124 +290,124 @@
   "EnemyBoard": {
    "Grid": [
     [
-     1,
-     1,
-     1,
-     1,
-     0,
-     0,
+     2,
      0,
      0,
      1,
+     1,
+     1,
+     1,
+     2,
+     0,
      0
     ],
     [
      0,
      0,
      0,
+     2,
+     2,
+     2,
+     2,
      0,
      0,
+     1
+    ],
+    [
      0,
      0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     1,
+     2,
+     0
+    ],
+    [
      0,
+     2,
+     2,
+     3,
+     2,
+     3,
+     2,
+     2,
      0,
      0
+    ],
+    [
+     0,
+     0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     2,
+     2,
+     0
+    ],
+    [
+     2,
+     0,
+     0,
+     0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     2,
+     3,
+     2,
+     1
     ],
     [
      2,
      2,
      2,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     3
     ],
     [
      2,
      3,
      2,
-     1,
-     0,
-     1,
-     1,
-     0,
-     0,
-     0
+     3,
+     3,
+     2,
+     2,
+     3,
+     2,
+     1
     ],
     [
      2,
+     3,
      2,
      2,
-     1,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     0,
-     1,
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
     ]
    ],
    "Ships": [
@@ -419,107 +419,131 @@
      "Position": [
       {
        "X": 0,
-       "Y": 0
-      },
-      {
-       "X": 0,
-       "Y": 1
-      },
-      {
-       "X": 0,
-       "Y": 2
-      },
-      {
-       "X": 0,
        "Y": 3
+      },
+      {
+       "X": 0,
+       "Y": 4
+      },
+      {
+       "X": 0,
+       "Y": 5
+      },
+      {
+       "X": 0,
+       "Y": 6
       }
      ]
     },
     {
      "Size": 3,
      "IsVertical": true,
-     "Hits": 0,
+     "Hits": 1,
      "IsSunk": false,
      "Position": [
       {
        "X": 6,
-       "Y": 6
+       "Y": 9
       },
       {
        "X": 7,
-       "Y": 6
+       "Y": 9
       },
       {
        "X": 8,
-       "Y": 6
+       "Y": 9
       }
      ]
     },
     {
      "Size": 3,
      "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 3,
+     "IsSunk": true,
      "Position": [
       {
+       "X": 2,
+       "Y": 5
+      },
+      {
        "X": 3,
-       "Y": 3
+       "Y": 5
       },
       {
        "X": 4,
-       "Y": 3
-      },
-      {
-       "X": 5,
-       "Y": 3
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 8,
-       "Y": 0
-      },
-      {
-       "X": 9,
-       "Y": 0
+       "Y": 5
       }
      ]
     },
     {
      "Size": 2,
      "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 2,
+     "IsSunk": true,
      "Position": [
       {
-       "X": 3,
-       "Y": 5
+       "X": 8,
+       "Y": 3
       },
       {
-       "X": 3,
-       "Y": 6
+       "X": 8,
+       "Y": 4
       }
      ]
     },
     {
      "Size": 2,
      "IsVertical": true,
+     "Hits": 2,
+     "IsSunk": true,
+     "Position": [
+      {
+       "X": 8,
+       "Y": 1
+      },
+      {
+       "X": 9,
+       "Y": 1
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": true,
+     "Hits": 2,
+     "IsSunk": true,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 7
+      },
+      {
+       "X": 6,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
-       "X": 4,
-       "Y": 8
-      },
+       "X": 2,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
       {
-       "X": 5,
-       "Y": 8
+       "X": 1,
+       "Y": 9
       }
      ]
     },
@@ -530,51 +554,30 @@
      "IsSunk": true,
      "Position": [
       {
-       "X": 3,
-       "Y": 1
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 0,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
        "X": 8,
-       "Y": 4
+       "Y": 7
       }
      ]
     },
     {
      "Size": 1,
      "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 1,
+     "IsSunk": true,
      "Position": [
       {
-       "X": 7,
-       "Y": 2
+       "X": 3,
+       "Y": 3
       }
      ]
     }
    ]
   },
-  "abilities": [
-   "Артиллерийский удар"
+  "Abilities": [
+   {
+    "Name": "scanner",
+    "RequiresTarget": true
+   }
   ],
   "HasDoubleDamage": false,
   "state": 0,
@@ -587,124 +590,124 @@
   "MyBoard": {
    "Grid": [
     [
-     1,
-     1,
-     1,
-     1,
-     0,
-     0,
+     2,
      0,
      0,
      1,
+     1,
+     1,
+     1,
+     2,
+     0,
      0
     ],
     [
      0,
      0,
      0,
+     2,
+     2,
+     2,
+     2,
      0,
      0,
+     1
+    ],
+    [
      0,
      0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     1,
+     2,
+     0
+    ],
+    [
      0,
+     2,
+     2,
+     3,
+     2,
+     3,
+     2,
+     2,
      0,
      0
+    ],
+    [
+     0,
+     0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     2,
+     2,
+     0
+    ],
+    [
+     2,
+     0,
+     0,
+     0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     2,
+     3,
+     2,
+     1
     ],
     [
      2,
      2,
      2,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     3
     ],
     [
      2,
      3,
      2,
-     1,
-     0,
-     1,
-     1,
-     0,
-     0,
-     0
+     3,
+     3,
+     2,
+     2,
+     3,
+     2,
+     1
     ],
     [
      2,
+     3,
      2,
      2,
-     1,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     0,
-     1,
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
     ]
    ],
    "Ships": [
@@ -716,107 +719,131 @@
      "Position": [
       {
        "X": 0,
-       "Y": 0
-      },
-      {
-       "X": 0,
-       "Y": 1
-      },
-      {
-       "X": 0,
-       "Y": 2
-      },
-      {
-       "X": 0,
        "Y": 3
+      },
+      {
+       "X": 0,
+       "Y": 4
+      },
+      {
+       "X": 0,
+       "Y": 5
+      },
+      {
+       "X": 0,
+       "Y": 6
       }
      ]
     },
     {
      "Size": 3,
      "IsVertical": true,
-     "Hits": 0,
+     "Hits": 1,
      "IsSunk": false,
      "Position": [
       {
        "X": 6,
-       "Y": 6
+       "Y": 9
       },
       {
        "X": 7,
-       "Y": 6
+       "Y": 9
       },
       {
        "X": 8,
-       "Y": 6
+       "Y": 9
       }
      ]
     },
     {
      "Size": 3,
      "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 3,
+     "IsSunk": true,
      "Position": [
       {
+       "X": 2,
+       "Y": 5
+      },
+      {
        "X": 3,
-       "Y": 3
+       "Y": 5
       },
       {
        "X": 4,
-       "Y": 3
-      },
-      {
-       "X": 5,
-       "Y": 3
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 8,
-       "Y": 0
-      },
-      {
-       "X": 9,
-       "Y": 0
+       "Y": 5
       }
      ]
     },
     {
      "Size": 2,
      "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 2,
+     "IsSunk": true,
      "Position": [
       {
-       "X": 3,
-       "Y": 5
+       "X": 8,
+       "Y": 3
       },
       {
-       "X": 3,
-       "Y": 6
+       "X": 8,
+       "Y": 4
       }
      ]
     },
     {
      "Size": 2,
      "IsVertical": true,
+     "Hits": 2,
+     "IsSunk": true,
+     "Position": [
+      {
+       "X": 8,
+       "Y": 1
+      },
+      {
+       "X": 9,
+       "Y": 1
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": true,
+     "Hits": 2,
+     "IsSunk": true,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 7
+      },
+      {
+       "X": 6,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
-       "X": 4,
-       "Y": 8
-      },
+       "X": 2,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
       {
-       "X": 5,
-       "Y": 8
+       "X": 1,
+       "Y": 9
       }
      ]
     },
@@ -827,32 +854,258 @@
      "IsSunk": true,
      "Position": [
       {
-       "X": 3,
-       "Y": 1
+       "X": 8,
+       "Y": 7
       }
      ]
     },
     {
      "Size": 1,
+     "IsVertical": false,
+     "Hits": 1,
+     "IsSunk": true,
+     "Position": [
+      {
+       "X": 3,
+       "Y": 3
+      }
+     ]
+    }
+   ]
+  },
+  "EnemyBoard": {
+   "Grid": [
+    [
+     1,
+     0,
+     1,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     2
+    ],
+    [
+     1,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     1,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0,
+     1,
+     1,
+     0,
+     0,
+     1
+    ],
+    [
+     2,
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     2,
+     0,
+     2
+    ],
+    [
+     0,
+     1,
+     1,
+     0,
+     1,
+     1,
+     0,
+     2,
+     2,
+     2
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     2,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     1,
+     1,
+     1,
+     0
+    ],
+    [
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   ],
+   "Ships": [
+    {
+     "Size": 4,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 8,
+       "Y": 5
+      },
+      {
+       "X": 8,
+       "Y": 6
+      },
+      {
+       "X": 8,
+       "Y": 7
+      },
+      {
+       "X": 8,
+       "Y": 8
+      }
+     ]
+    },
+    {
+     "Size": 3,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 1,
+       "Y": 5
+      },
+      {
+       "X": 1,
+       "Y": 6
+      },
+      {
+       "X": 1,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 3,
      "IsVertical": true,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
        "X": 0,
-       "Y": 8
+       "Y": 0
+      },
+      {
+       "X": 1,
+       "Y": 0
+      },
+      {
+       "X": 2,
+       "Y": 0
       }
      ]
     },
     {
-     "Size": 1,
-     "IsVertical": true,
+     "Size": 2,
+     "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
-       "X": 8,
+       "X": 5,
        "Y": 4
+      },
+      {
+       "X": 5,
+       "Y": 5
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 1
+      },
+      {
+       "X": 5,
+       "Y": 2
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 3,
+       "Y": 5
+      },
+      {
+       "X": 3,
+       "Y": 6
       }
      ]
     },
@@ -867,317 +1120,124 @@
        "Y": 2
       }
      ]
-    }
-   ]
-  },
-  "EnemyBoard": {
-   "Grid": [
-    [
-     0,
-     0,
-     0,
-     0,
-     1,
-     1,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     1,
-     1,
-     1,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     1,
-     1,
-     1,
-     0,
-     0,
-     0,
-     0
-    ]
-   ],
-   "Ships": [
+    },
     {
-     "Size": 4,
+     "Size": 1,
      "IsVertical": true,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
        "X": 3,
-       "Y": 6
-      },
-      {
-       "X": 4,
-       "Y": 6
-      },
-      {
-       "X": 5,
-       "Y": 6
-      },
-      {
-       "X": 6,
-       "Y": 6
+       "Y": 9
       }
      ]
     },
     {
-     "Size": 3,
-     "IsVertical": false,
+     "Size": 1,
+     "IsVertical": true,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
-       "X": 9,
-       "Y": 3
-      },
-      {
-       "X": 9,
-       "Y": 4
-      },
-      {
-       "X": 9,
-       "Y": 5
-      }
-     ]
-    },
-    {
-     "Size": 3,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 1
-      },
-      {
-       "X": 3,
+       "X": 0,
        "Y": 2
-      },
-      {
-       "X": 3,
-       "Y": 3
       }
      ]
     },
     {
-     "Size": 2,
+     "Size": 1,
      "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
-      {
-       "X": 0,
-       "Y": 4
-      },
-      {
-       "X": 0,
-       "Y": 5
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 5,
-       "Y": 8
-      },
       {
        "X": 6,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 5,
-       "Y": 0
-      },
-      {
-       "X": 6,
-       "Y": 0
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 8,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 1,
-       "Y": 0
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 8,
-       "Y": 1
+       "Y": 7
       }
      ]
     }
    ]
   },
-  "abilities": [],
+  "Abilities": [],
   "HasDoubleDamage": false,
   "state": 0,
   "all_hits": [],
   "target_hits": [],
-  "verified_points": []
+  "verified_points": [
+   {
+    "X": 4,
+    "Y": 9
+   },
+   {
+    "X": 9,
+    "Y": 1
+   },
+   {
+    "X": 6,
+    "Y": 5
+   },
+   {
+    "X": 4,
+    "Y": 0
+   },
+   {
+    "X": 5,
+    "Y": 7
+   },
+   {
+    "X": 0,
+    "Y": 9
+   },
+   {
+    "X": 3,
+    "Y": 3
+   },
+   {
+    "X": 5,
+    "Y": 8
+   },
+   {
+    "X": 4,
+    "Y": 7
+   },
+   {
+    "X": 7,
+    "Y": 9
+   },
+   {
+    "X": 4,
+    "Y": 4
+   },
+   {
+    "X": 5,
+    "Y": 9
+   },
+   {
+    "X": 2,
+    "Y": 2
+   },
+   {
+    "X": 0,
+    "Y": 4
+   }
+  ]
  },
  "CurrentPlayer": {
   "Name": "Player",
   "MyBoard": {
    "Grid": [
     [
-     0,
-     0,
-     0,
-     0,
-     1,
      1,
      0,
+     1,
+     0,
+     2,
      0,
      0,
-     0
+     0,
+     0,
+     2
     ],
     [
      1,
@@ -1185,76 +1245,16 @@
      0,
      0,
      0,
-     0,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
      1,
      1,
      1,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
      0,
      0
     ],
     [
      1,
      0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
+     2,
      0,
      0,
      0,
@@ -1265,23 +1265,83 @@
     ],
     [
      0,
+     0,
+     0,
+     2,
+     0,
+     1,
      1,
      0,
      0,
+     1
+    ],
+    [
+     2,
      0,
      0,
      0,
+     2,
+     0,
+     0,
+     2,
+     0,
+     2
+    ],
+    [
      0,
      1,
-     0
+     1,
+     0,
+     1,
+     1,
+     0,
+     2,
+     2,
+     2
     ],
     [
      0,
      0,
      0,
+     0,
+     0,
+     2,
+     0,
+     1,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     2
+    ],
+    [
+     0,
+     0,
+     0,
+     0,
+     0,
      1,
      1,
      1,
+     1,
+     0
+    ],
+    [
+     0,
+     2,
+     0,
+     0,
+     0,
+     0,
      0,
      0,
      0,
@@ -1291,134 +1351,22 @@
    "Ships": [
     {
      "Size": 4,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 6
-      },
-      {
-       "X": 4,
-       "Y": 6
-      },
-      {
-       "X": 5,
-       "Y": 6
-      },
-      {
-       "X": 6,
-       "Y": 6
-      }
-     ]
-    },
-    {
-     "Size": 3,
      "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
-       "X": 9,
-       "Y": 3
-      },
-      {
-       "X": 9,
-       "Y": 4
-      },
-      {
-       "X": 9,
+       "X": 8,
        "Y": 5
-      }
-     ]
-    },
-    {
-     "Size": 3,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 1
       },
       {
-       "X": 3,
-       "Y": 2
+       "X": 8,
+       "Y": 6
       },
       {
-       "X": 3,
-       "Y": 3
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 0,
-       "Y": 4
+       "X": 8,
+       "Y": 7
       },
-      {
-       "X": 0,
-       "Y": 5
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 5,
-       "Y": 8
-      },
-      {
-       "X": 6,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 5,
-       "Y": 0
-      },
-      {
-       "X": 6,
-       "Y": 0
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 3,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
       {
        "X": 8,
        "Y": 8
@@ -1426,14 +1374,90 @@
      ]
     },
     {
-     "Size": 1,
-     "IsVertical": true,
+     "Size": 3,
+     "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
        "X": 1,
+       "Y": 5
+      },
+      {
+       "X": 1,
+       "Y": 6
+      },
+      {
+       "X": 1,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 3,
+     "IsVertical": true,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 0,
        "Y": 0
+      },
+      {
+       "X": 1,
+       "Y": 0
+      },
+      {
+       "X": 2,
+       "Y": 0
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 4
+      },
+      {
+       "X": 5,
+       "Y": 5
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 1
+      },
+      {
+       "X": 5,
+       "Y": 2
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 3,
+       "Y": 5
+      },
+      {
+       "X": 3,
+       "Y": 6
       }
      ]
     },
@@ -1444,8 +1468,44 @@
      "IsSunk": false,
      "Position": [
       {
-       "X": 8,
-       "Y": 1
+       "X": 7,
+       "Y": 2
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": true,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 3,
+       "Y": 9
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": true,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 0,
+       "Y": 2
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
+      {
+       "X": 6,
+       "Y": 7
       }
      ]
     }
@@ -1454,124 +1514,124 @@
   "EnemyBoard": {
    "Grid": [
     [
-     1,
-     1,
-     1,
-     1,
-     0,
-     0,
+     2,
      0,
      0,
      1,
+     1,
+     1,
+     1,
+     2,
+     0,
      0
     ],
     [
      0,
      0,
      0,
+     2,
+     2,
+     2,
+     2,
      0,
      0,
+     1
+    ],
+    [
      0,
      0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     1,
+     2,
+     0
+    ],
+    [
      0,
+     2,
+     2,
+     3,
+     2,
+     3,
+     2,
+     2,
      0,
      0
+    ],
+    [
+     0,
+     0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     2,
+     2,
+     0
+    ],
+    [
+     2,
+     0,
+     0,
+     0,
+     2,
+     2,
+     2,
+     3,
+     2,
+     0
+    ],
+    [
+     0,
+     0,
+     0,
+     2,
+     0,
+     0,
+     2,
+     3,
+     2,
+     1
     ],
     [
      2,
      2,
      2,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
+     2,
+     2,
+     2,
+     2,
+     2,
+     2,
+     3
     ],
     [
      2,
      3,
      2,
-     1,
-     0,
-     1,
-     1,
-     0,
-     0,
-     0
+     3,
+     3,
+     2,
+     2,
+     3,
+     2,
+     1
     ],
     [
      2,
+     3,
      2,
      2,
-     1,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0
-    ],
-    [
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     0,
-     0,
-     1,
-     0,
-     0,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     1,
-     0,
-     1,
-     0,
-     0,
-     0
-    ],
-    [
-     1,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0,
-     0
+     2,
+     2,
+     2,
+     2,
+     2,
+     2
     ]
    ],
    "Ships": [
@@ -1583,107 +1643,131 @@
      "Position": [
       {
        "X": 0,
-       "Y": 0
-      },
-      {
-       "X": 0,
-       "Y": 1
-      },
-      {
-       "X": 0,
-       "Y": 2
-      },
-      {
-       "X": 0,
        "Y": 3
+      },
+      {
+       "X": 0,
+       "Y": 4
+      },
+      {
+       "X": 0,
+       "Y": 5
+      },
+      {
+       "X": 0,
+       "Y": 6
       }
      ]
     },
     {
      "Size": 3,
      "IsVertical": true,
-     "Hits": 0,
+     "Hits": 1,
      "IsSunk": false,
      "Position": [
       {
        "X": 6,
-       "Y": 6
+       "Y": 9
       },
       {
        "X": 7,
-       "Y": 6
+       "Y": 9
       },
       {
        "X": 8,
-       "Y": 6
+       "Y": 9
       }
      ]
     },
     {
      "Size": 3,
      "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 3,
+     "IsSunk": true,
      "Position": [
       {
+       "X": 2,
+       "Y": 5
+      },
+      {
        "X": 3,
-       "Y": 3
+       "Y": 5
       },
       {
        "X": 4,
-       "Y": 3
-      },
-      {
-       "X": 5,
-       "Y": 3
-      }
-     ]
-    },
-    {
-     "Size": 2,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 8,
-       "Y": 0
-      },
-      {
-       "X": 9,
-       "Y": 0
+       "Y": 5
       }
      ]
     },
     {
      "Size": 2,
      "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 2,
+     "IsSunk": true,
      "Position": [
       {
-       "X": 3,
-       "Y": 5
+       "X": 8,
+       "Y": 3
       },
       {
-       "X": 3,
-       "Y": 6
+       "X": 8,
+       "Y": 4
       }
      ]
     },
     {
      "Size": 2,
      "IsVertical": true,
+     "Hits": 2,
+     "IsSunk": true,
+     "Position": [
+      {
+       "X": 8,
+       "Y": 1
+      },
+      {
+       "X": 9,
+       "Y": 1
+      }
+     ]
+    },
+    {
+     "Size": 2,
+     "IsVertical": true,
+     "Hits": 2,
+     "IsSunk": true,
+     "Position": [
+      {
+       "X": 5,
+       "Y": 7
+      },
+      {
+       "X": 6,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
      "Hits": 0,
      "IsSunk": false,
      "Position": [
       {
-       "X": 4,
-       "Y": 8
-      },
+       "X": 2,
+       "Y": 7
+      }
+     ]
+    },
+    {
+     "Size": 1,
+     "IsVertical": false,
+     "Hits": 0,
+     "IsSunk": false,
+     "Position": [
       {
-       "X": 5,
-       "Y": 8
+       "X": 1,
+       "Y": 9
       }
      ]
     },
@@ -1694,51 +1778,30 @@
      "IsSunk": true,
      "Position": [
       {
-       "X": 3,
-       "Y": 1
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
-       "X": 0,
-       "Y": 8
-      }
-     ]
-    },
-    {
-     "Size": 1,
-     "IsVertical": true,
-     "Hits": 0,
-     "IsSunk": false,
-     "Position": [
-      {
        "X": 8,
-       "Y": 4
+       "Y": 7
       }
      ]
     },
     {
      "Size": 1,
      "IsVertical": false,
-     "Hits": 0,
-     "IsSunk": false,
+     "Hits": 1,
+     "IsSunk": true,
      "Position": [
       {
-       "X": 7,
-       "Y": 2
+       "X": 3,
+       "Y": 3
       }
      ]
     }
    ]
   },
-  "abilities": [
-   "Артиллерийский удар"
+  "Abilities": [
+   {
+    "Name": "scanner",
+    "RequiresTarget": true
+   }
   ],
   "HasDoubleDamage": false,
   "state": 0,

@@ -6,11 +6,16 @@ import (
 	"os"
 )
 
+type AbilityDTO struct {
+	Name           string `json:"Name"`
+	RequiresTarget bool   `json:"RequiresTarget"`
+}
+
 type RawPlayer struct {
 	Name            string
 	MyBoard         *Board
 	EnemyBoard      *Board
-	AbilityNames    []string `json:"abilities"`
+	Abilities       []AbilityDTO `json:"Abilities"`
 	HasDoubleDamage bool
 
 	State          AIState `json:"state"`           // поведение ИИ
@@ -20,16 +25,19 @@ type RawPlayer struct {
 }
 
 func (p *Player) MarshalJSON() ([]byte, error) {
-	abilities := make([]string, len(p.Abilities))
+	abilities := make([]AbilityDTO, len(p.Abilities))
 	for i, ability := range p.Abilities {
-		abilities[i] = ability.Name()
+		abilities[i] = AbilityDTO{
+			Name:           ability.Name(),
+			RequiresTarget: ability.RequiresTarget(),
+		}
 	}
 
 	raw := RawPlayer{
 		Name:            p.Name,
 		MyBoard:         p.MyBoard,
 		EnemyBoard:      p.EnemyBoard,
-		AbilityNames:    abilities,
+		Abilities:       abilities,
 		HasDoubleDamage: p.HasDoubleDamage,
 
 		State:          p.State,
@@ -57,13 +65,14 @@ func (p *Player) UnmarshalJSON(data []byte) error {
 	p.TargetHits = raw.TargetHits
 	p.VerifiedPoints = raw.VerifiedPoints
 
-	for _, abilityName := range raw.AbilityNames {
-		switch abilityName {
+	p.Abilities = []Ability{}
+	for _, ab := range raw.Abilities {
+		switch ab.Name {
 		case "Артиллерийский удар":
 			p.Abilities = append(p.Abilities, &ArtilleryStrike{})
-		case "Сканнер.":
+		case "Сканнер":
 			p.Abilities = append(p.Abilities, &Scanner{})
-		case "Двойной урон.":
+		case "Двойной урон":
 			p.Abilities = append(p.Abilities, &DoubleDamage{})
 		}
 	}

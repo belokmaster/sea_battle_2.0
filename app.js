@@ -157,10 +157,15 @@ async function useAbility(abilityName, x, y) {
         const response = await fetch(url, { method: 'POST' });
         const result = await response.json();
         if (!response.ok) throw new Error(result.Message || 'Ошибка способности');
+
         messageAreaEl.textContent = result.message;
         if (result.attack_result) {
             await animateMove(enemyBoardEl, result.attack_result);
         }
+        if (result.affected_points) {
+            await animateScan(enemyBoardEl, result.affected_points);
+        }
+
         if (result.game_over) {
             handleGameOver(result.winner);
             return;
@@ -174,6 +179,19 @@ async function useAbility(abilityName, x, y) {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function animateScan(boardElement, points) {
+    if (!points || points.length === 0) return;
+
+    for (const p of points) {
+        const cell = boardElement.rows[p.X].cells[p.Y];
+        cell.classList.remove('cell-scanned');
+        void cell.offsetWidth;
+        cell.classList.add('cell-scanned');
+    }
+
+    await sleep(4000);
 }
 
 async function animateMove(boardElement, moveData) {

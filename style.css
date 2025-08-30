@@ -12,6 +12,7 @@ body {
     gap: 30px;
     margin: 20px;
     align-items: flex-start;
+    margin-top: 0;
 }
 
 .abilities-container {
@@ -73,6 +74,7 @@ body {
 
 #message-area {
     margin: 20px;
+    margin-bottom: 15px;
     padding: 10px;
     min-height: 40px;
     width: 1025px;

@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+type ShipPlacementPayload struct {
+	Ships []game.Ship `json:"ships"`
+}
+
 func sendJSON(w http.ResponseWriter, data interface{}, status int) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
@@ -70,7 +74,7 @@ func loadGameHandler(w http.ResponseWriter, r *http.Request) {
 	sendJSON(w, map[string]string{"message": "Игра успешно загружена"}, http.StatusOK)
 }
 
-func newGameHandler(w http.ResponseWriter, r *http.Request) {
+func newGameAutoHandler(w http.ResponseWriter, r *http.Request) {
 	gameMutex.Lock()
 	defer gameMutex.Unlock()
 	if r.Method != http.MethodPost {
@@ -79,6 +83,31 @@ func newGameHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	currentGame = game.NewGame()
 	sendJSON(w, map[string]string{"message": "Новая игра успешно создана"}, http.StatusOK)
+}
+
+func newGameManualHandler(w http.ResponseWriter, r *http.Request) {
+	gameMutex.Lock()
+	defer gameMutex.Unlock()
+
+	if r.Method != http.MethodPost {
+		sendJSONError(w, "Метод не разрешен", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var payload ShipPlacementPayload
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
+		sendJSONError(w, "Неверные данные для расстановки кораблей: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	playerBoard, err := game.NewBoardWithShips(payload.Ships)
+	if err != nil {
+		sendJSONError(w, "Ошибка при расстановке кораблей: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	currentGame = game.NewGameManual(playerBoard)
+	sendJSON(w, map[string]string{"message": "Новая игра (ручная расстановка) успешно создана"}, http.StatusOK)
 }
 
 func abilityHandler(w http.ResponseWriter, r *http.Request) {

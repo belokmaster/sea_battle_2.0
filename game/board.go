@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 )
 
@@ -10,6 +11,24 @@ func NewBoard() *Board {
 		Grid:  [10][10]CellState{},
 		Ships: []Ship{},
 	}
+}
+
+func NewBoardWithShips(shipsToPlace []Ship) (*Board, error) {
+	b := NewBoard()
+	for _, shipData := range shipsToPlace {
+		if len(shipData.Position) == 0 {
+			return nil, fmt.Errorf("не указана стартовая позиция для корабля размером %d", shipData.Size)
+		}
+		startPoint := shipData.Position[0]
+		s := Ship{
+			Size:       shipData.Size,
+			IsVertical: shipData.IsVertical,
+		}
+		if err := b.placeShip(&s, startPoint); err != nil {
+			return nil, fmt.Errorf("не удалось разместить %d-палубный корабль в (%d, %d): %w", s.Size, startPoint.X, startPoint.Y, err)
+		}
+	}
+	return b, nil
 }
 
 func (b *Board) placeShip(ship *Ship, startPoint Point) error {

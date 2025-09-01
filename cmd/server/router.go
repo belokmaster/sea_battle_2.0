@@ -7,7 +7,8 @@ func newRouter() *http.ServeMux {
 
 	apiMux := http.NewServeMux()
 	apiMux.HandleFunc("/game", gameStatusHandler)
-	apiMux.HandleFunc("/newgame", newGameHandler)
+	apiMux.HandleFunc("/newgame/auto", newGameAutoHandler)
+	apiMux.HandleFunc("/newgame/manual", newGameManualHandler)
 	apiMux.HandleFunc("/attack", attackHandler)
 	apiMux.HandleFunc("/ability", abilityHandler)
 	apiMux.HandleFunc("/save", saveGameHandler)

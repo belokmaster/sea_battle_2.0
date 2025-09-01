@@ -14,23 +14,56 @@ func NewGameFromFile(filename string) *Game {
 }
 
 func NewGame() *Game {
-	board1 := NewBoard()
-	board2 := NewBoard()
-	board1.PlaceBoard()
-	board2.PlaceBoard()
+	playerBoard := NewBoard()
+	computerBoard := NewBoard()
+	playerBoard.PlaceBoard()
+	computerBoard.PlaceBoard()
 
 	p1 := Player{
 		Name:            "Player",
-		MyBoard:         board1,
-		EnemyBoard:      board2,
+		MyBoard:         playerBoard,
+		EnemyBoard:      computerBoard,
 		Abilities:       []Ability{},
 		HasDoubleDamage: false,
 	}
 
 	p2 := Player{
 		Name:            "Computer",
-		MyBoard:         board2,
-		EnemyBoard:      board1,
+		MyBoard:         computerBoard,
+		EnemyBoard:      playerBoard,
+		Abilities:       []Ability{},
+		HasDoubleDamage: false,
+		State:           Searching,
+		AllHits:         []Point{},
+		TargetHits:      []Point{},
+		VerifiedPoints:  []Point{},
+	}
+
+	game := Game{
+		Player1:       &p1,
+		Player2:       &p2,
+		CurrentPlayer: &p1,
+	}
+
+	return &game
+}
+
+func NewGameManual(playerBoard *Board) *Game {
+	computerBoard := NewBoard()
+	computerBoard.PlaceBoard()
+
+	p1 := Player{
+		Name:            "Player",
+		MyBoard:         playerBoard,
+		EnemyBoard:      computerBoard,
+		Abilities:       []Ability{},
+		HasDoubleDamage: false,
+	}
+
+	p2 := Player{
+		Name:            "Computer",
+		MyBoard:         computerBoard,
+		EnemyBoard:      playerBoard,
 		Abilities:       []Ability{},
 		HasDoubleDamage: false,
 		State:           Searching,

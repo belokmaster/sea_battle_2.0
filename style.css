@@ -92,7 +92,9 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.controls button {
+.controls button,
+.modal-content button,
+.placement-controls button {
     padding: 10px 20px;
     font-size: 1em;
     cursor: pointer;
@@ -103,13 +105,16 @@ body {
     margin: 0 5px;
 }
 
+.modal-content button {
+    margin: 10px;
+}
+
 .abilities-panel {
     width: 100%;
     padding: 10px;
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
     height: 380px;
     overflow-y: auto;
     box-sizing: border-box;
@@ -135,11 +140,6 @@ body {
 }
 
 .ability-button:hover {
-    background-color: #f0f0f0;
-    color: #000;
-}
-
-.ability-button:hover {
     background-color: #007bff;
     color: white;
 }
@@ -148,11 +148,6 @@ body {
     background-color: #28a745;
     color: white;
     border-color: #28a745;
-}
-
-.ability-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
 }
 
 @keyframes cell-attack-anim {
@@ -172,4 +167,82 @@ body {
 
 .cell-attacked {
     animation: cell-attack-anim 0.5s ease-out;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px 40px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+#placement-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.placement-area {
+    display: flex;
+    gap: 30px;
+}
+
+.ship-list-container {
+    width: 200px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#ship-list {
+    list-style: none;
+    padding: 0;
+}
+
+#ship-list li {
+    padding: 10px;
+    margin: 5px 0;
+    background: #f0f0f0;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    border: 2px solid transparent;
+}
+
+
+#ship-list li.selected {
+    border-color: #007bff;
+    font-weight: bold;
+}
+
+#placement-board td {
+    background-color: #eef7ff;
+    cursor: pointer;
+}
+
+.cell-preview-valid {
+    background-color: #90ee90 !important;
+}
+
+.cell-preview-invalid {
+    background-color: #ffcccb !important;
+}
+
+.placement-controls {
+    margin-bottom: 20px;
 }

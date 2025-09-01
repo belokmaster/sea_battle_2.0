@@ -8,8 +8,24 @@ const abilitiesListEl = document.getElementById('abilities-list');
 const saveGameButton = document.getElementById('save-game-button');
 const loadGameButton = document.getElementById('load-game-button');
 
+const newGameModal = document.getElementById('new-game-modal');
+const mainGameContainer = document.getElementById('main-game-container');
+const placementContainer = document.getElementById('placement-container');
+const autoPlaceButton = document.getElementById('auto-place-button');
+const manualPlaceButton = document.getElementById('manual-place-button');
+const cancelNewGameButton = document.getElementById('cancel-new-game-button');
+const placementBoardEl = document.getElementById('placement-board');
+const shipListEl = document.getElementById('ship-list');
+const rotateShipButton = document.getElementById('rotate-ship-button');
+const resetPlacementButton = document.getElementById('reset-placement-button');
+const startManualGameButton = document.getElementById('start-manual-game-button');
+
 let isAnimating = false;
 let selectedAbility = null;
+let shipsToPlace = [];
+let placedShips = [];
+let selectedShipToPlace = null;
+let isShipVertical = false;
 
 async function updateGameView() {
     try {
@@ -190,7 +206,6 @@ async function animateScan(boardElement, points) {
         void cell.offsetWidth;
         cell.classList.add('cell-scanned');
     }
-
     await sleep(4000);
 }
 
@@ -205,7 +220,6 @@ async function animateMove(boardElement, moveData) {
     };
 
     if (move.x === undefined || move.y === undefined) {
-        console.error("Не удалось определить координаты хода из данных:", moveData);
         return;
     }
 
@@ -218,7 +232,6 @@ async function animateMove(boardElement, moveData) {
     } else {
         cell.className = 'cell-hit'; cell.textContent = '✕';
     }
-
     await sleep(200);
 
     if (move.result === 2 && move.marked_points) {
@@ -239,15 +252,212 @@ function handleGameOver(winner) {
     isAnimating = true;
 }
 
-newGameButton.addEventListener('click', async () => {
-    if (isAnimating) return;
-    await fetch(`${API_URL}/newgame`, { method: 'POST' });
-    updateGameView();
+function initializePlacementState() {
+    shipsToPlace = [
+        { id: 0, size: 4, name: 'Линкор (4)' },
+        { id: 1, size: 3, name: 'Крейсер 1 (3)' },
+        { id: 2, size: 3, name: 'Крейсер 2 (3)' },
+        { id: 3, size: 2, name: 'Эсминец 1 (2)' },
+        { id: 4, size: 2, name: 'Эсминец 2 (2)' },
+        { id: 5, size: 2, name: 'Эсминец 3 (2)' },
+        { id: 6, size: 1, name: 'Катер 1 (1)' },
+        { id: 7, size: 1, name: 'Катер 2 (1)' },
+        { id: 8, size: 1, name: 'Катер 3 (1)' },
+        { id: 9, size: 1, name: 'Катер 4 (1)' }
+    ];
+    placedShips = [];
+    selectedShipToPlace = null;
+    isShipVertical = false;
+    renderPlacementBoard();
+    renderShipList();
+    updatePlacementControls();
+}
+
+function renderPlacementBoard() {
+    placementBoardEl.innerHTML = '';
+    let grid = Array(10).fill(0).map(() => Array(10).fill(0));
+
+    placedShips.forEach(ship => {
+        ship.Position.forEach(p => {
+            grid[p.X][p.Y] = 1;
+        });
+    });
+
+    for (let i = 0; i < 10; i++) {
+        const row = document.createElement('tr');
+        for (let j = 0; j < 10; j++) {
+            const cell = document.createElement('td');
+            if (grid[i][j] === 1) {
+                cell.className = 'cell-ship';
+                cell.style.backgroundColor = '#777';
+            } else {
+                cell.className = 'cell-empty';
+                cell.style.backgroundColor = '#eef7ff';
+            }
+
+            cell.dataset.x = i;
+            cell.dataset.y = j;
+            cell.addEventListener('mouseover', onPlacementCellMouseover);
+            cell.addEventListener('mouseout', onPlacementCellMouseout);
+            cell.addEventListener('click', onPlacementCellClick);
+            row.appendChild(cell);
+        }
+        placementBoardEl.appendChild(row);
+    }
+}
+
+function renderShipList() {
+    shipListEl.innerHTML = '';
+    shipsToPlace.forEach(ship => {
+        const li = document.createElement('li');
+        li.textContent = ship.name;
+        li.dataset.shipId = ship.id;
+        if (selectedShipToPlace && selectedShipToPlace.id === ship.id) {
+            li.classList.add('selected');
+        }
+        li.addEventListener('click', () => {
+            selectedShipToPlace = ship;
+            renderShipList();
+        });
+        shipListEl.appendChild(li);
+    });
+}
+
+function getShipPointsAndValidation(startX, startY, size, isVertical) {
+    let points = [];
+    let isValid = true;
+    for (let i = 0; i < size; i++) {
+        const x = isVertical ? startX + i : startX;
+        const y = isVertical ? startY : startY + i;
+        points.push({ x, y });
+        if (x >= 10 || y >= 10) isValid = false;
+    }
+    if (!isValid) return { points, isValid };
+
+    for (const p of points) {
+        for (let dx = -1; dx <= 1; dx++) {
+            for (let dy = -1; dy <= 1; dy++) {
+                const checkX = p.x + dx;
+                const checkY = p.y + dy;
+                if (checkX >= 0 && checkX < 10 && checkY >= 0 && checkY < 10) {
+                    if (placementBoardEl.rows[checkX].cells[checkY].classList.contains('cell-ship')) {
+                        isValid = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!isValid) break;
+    }
+    return { points, isValid };
+}
+
+function onPlacementCellMouseover(e) {
+    if (!selectedShipToPlace) return;
+    const x = parseInt(e.target.dataset.x);
+    const y = parseInt(e.target.dataset.y);
+    const { points, isValid } = getShipPointsAndValidation(x, y, selectedShipToPlace.size, isShipVertical);
+    points.forEach(p => {
+        const cell = placementBoardEl.rows[p.x]?.cells[p.y];
+        if (cell) cell.classList.add(isValid ? 'cell-preview-valid' : 'cell-preview-invalid');
+    });
+}
+
+function onPlacementCellMouseout(e) {
+    if (!selectedShipToPlace) return;
+    const x = parseInt(e.target.dataset.x);
+    const y = parseInt(e.target.dataset.y);
+    const { points } = getShipPointsAndValidation(x, y, selectedShipToPlace.size, isShipVertical);
+    points.forEach(p => {
+        const cell = placementBoardEl.rows[p.x]?.cells[p.y];
+        if (cell) cell.classList.remove('cell-preview-valid', 'cell-preview-invalid');
+    });
+}
+
+function onPlacementCellClick(e) {
+    if (!selectedShipToPlace) return;
+    const x = parseInt(e.target.dataset.x);
+    const y = parseInt(e.target.dataset.y);
+    const { points, isValid } = getShipPointsAndValidation(x, y, selectedShipToPlace.size, isShipVertical);
+
+    if (isValid) {
+        placedShips.push({
+            Size: selectedShipToPlace.size,
+            IsVertical: isShipVertical,
+            Position: points.map(p => ({ X: p.x, Y: p.y })),
+        });
+        shipsToPlace = shipsToPlace.filter(s => s.id !== selectedShipToPlace.id);
+        selectedShipToPlace = shipsToPlace[0] || null;
+        renderPlacementBoard();
+        renderShipList();
+        updatePlacementControls();
+    }
+}
+
+function updatePlacementControls() {
+    rotateShipButton.textContent = `Повернуть (${isShipVertical ? 'Горизонтально' : 'Вертикально'})`;
+    startManualGameButton.disabled = shipsToPlace.length > 0;
+}
+
+newGameButton.addEventListener('click', () => {
+    newGameModal.style.display = 'flex';
 });
+
+cancelNewGameButton.addEventListener('click', () => {
+    newGameModal.style.display = 'none';
+});
+
+autoPlaceButton.addEventListener('click', async () => {
+    newGameModal.style.display = 'none';
+    mainGameContainer.style.display = 'flex';
+    placementContainer.style.display = 'none';
+    await fetch(`${API_URL}/newgame/auto`, { method: 'POST' });
+    await updateGameView();
+});
+
+manualPlaceButton.addEventListener('click', () => {
+    newGameModal.style.display = 'none';
+    mainGameContainer.style.display = 'none';
+    placementContainer.style.display = 'flex';
+    initializePlacementState();
+});
+
+rotateShipButton.addEventListener('click', () => {
+    isShipVertical = !isShipVertical;
+    updatePlacementControls();
+});
+
+resetPlacementButton.addEventListener('click', initializePlacementState);
+
+startManualGameButton.addEventListener('click', async () => {
+    const payload = {
+        ships: placedShips.map(ship => ({
+            Size: ship.Size,
+            IsVertical: ship.IsVertical,
+            Position: [{ X: ship.Position[0].X, Y: ship.Position[0].Y }],
+        }))
+    };
+    try {
+        const response = await fetch(`${API_URL}/newgame/manual`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.Message || 'Ошибка создания игры');
+        placementContainer.style.display = 'none';
+        mainGameContainer.style.display = 'flex';
+        await updateGameView();
+    } catch (error) {
+        messageAreaEl.textContent = `Ошибка: ${error.message}`;
+    }
+});
+
 saveGameButton.addEventListener('click', () => {
     if (isAnimating) return;
     fetch(`${API_URL}/save`, { method: 'POST' });
 });
+
 loadGameButton.addEventListener('click', async () => {
     if (isAnimating) return;
     await fetch(`${API_URL}/load`, { method: 'POST' });
